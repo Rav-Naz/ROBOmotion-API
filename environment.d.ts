@@ -5,7 +5,7 @@ declare global {
             DB_USERNAME: string;
             DB_PASSWORD: string;
             DB_HOST: string;
-            DB_PORT: number;
+            DB_PORT: string;
             DB_DATABASE_NAME: string;
         }
     }

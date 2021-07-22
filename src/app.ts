@@ -1,16 +1,27 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
+import morgan from 'morgan';
+import swaggerUI from 'swagger-ui-express';
+import swaggerJsDoc from 'swagger-jsdoc';
 dotenv.config();
+
 
 import publicRoutes from './routes/public';
 import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
 import emptyRoutes from './routes/empty';
+import * as swaggerDoc from './swagger.json'
 
 const app = express();
 
+const port = process.env.DB_PORT || 8080;
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc))
+
 app.use(bodyParser.json({ limit: '50mb' }));
+
+app.use(morgan('short'));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,4 +36,4 @@ app.use('/admin', adminRoutes);
 
 app.use(emptyRoutes);
 
-app.listen(process.env.DB_PORT);
+app.listen(port);

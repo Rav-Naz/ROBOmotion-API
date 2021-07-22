@@ -1,0 +1,59 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "API for ROBO~motion event",
+        "description": "Full network system to management ROBO~motion event",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "localhost:8080",
+    "basePath": "",
+    "schemes": ["http"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "tags": [{
+        "name": "Public",
+        "description": "Endpoints for every user of the system"
+    }],
+    "definitions": {
+        "user": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "second": {
+                    "type": "string"
+                }
+
+            }
+        }
+    },
+    "paths": {
+        "/public": {
+            "get": {
+                "tags": ["Public"],
+                "summary": "Get all robots",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/public/hello": {
+            "get": {
+                "tags": ["Public"],
+                "summary": "Get all robots v2",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}
