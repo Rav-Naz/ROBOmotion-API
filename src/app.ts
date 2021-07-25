@@ -3,9 +3,7 @@ import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import morgan from 'morgan';
 import swaggerUI from 'swagger-ui-express';
-import swaggerJsDoc from 'swagger-jsdoc';
 dotenv.config();
-
 
 import publicRoutes from './routes/public';
 import userRoutes from './routes/user';

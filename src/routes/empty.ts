@@ -1,22 +1,23 @@
 import express from 'express';
+import { ClientError } from '../responses/client_errors'
 
 const router = express.Router();
 
 
 router.get('*', (req, res, next) => {
-    res.send('Cannot reach the path');
+    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
 })
 router.post('*', (req, res, next) => {
-    res.send('Cannot reach the path');
+    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
 })
 router.delete('*', (req, res, next) => {
-    res.send('Cannot reach the path');
+    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
 })
 router.patch('*', (req, res, next) => {
-    res.send('Cannot reach the path');
+    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
 })
 router.put('*', (req, res, next) => {
-    res.send('Cannot reach the path');
+    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
 })
 
 export default router;
