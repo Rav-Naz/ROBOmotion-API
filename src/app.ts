@@ -9,6 +9,7 @@ dotenv.config();
 import publicRoutes from './routes/public';
 import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
+import siteRoutes from './utils/site';
 import emptyRoutes from './routes/empty';
 import { apiRatelimit } from './utils/ddos_protection'
 
@@ -34,6 +35,7 @@ app.use((req, res, next) => { //CORS
 app.use('/public', publicRoutes);
 app.use('/user', userRoutes);
 app.use('/admin', adminRoutes);
+app.use('/site', siteRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 

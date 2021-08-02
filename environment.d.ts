@@ -7,6 +7,7 @@ declare global {
             DB_HOST: string;
             DB_PORT: string;
             DB_DATABASE_NAME: string;
+            WS_STREAMLINK: string;
         }
     }
 }
