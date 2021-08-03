@@ -3,7 +3,8 @@ import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import morgan from 'morgan';
 import swaggerUI from 'swagger-ui-express';
-import * as swaggerDoc from './swagger.json';
+import * as swaggerDoc from './swagger.json'; 
+import * as http from 'http';
 dotenv.config();
 
 import publicRoutes from './routes/public';
@@ -11,11 +12,20 @@ import userRoutes from './routes/user';
 import adminRoutes from './routes/admin';
 import siteRoutes from './utils/site';
 import emptyRoutes from './routes/empty';
-import { apiRatelimit } from './utils/ddos_protection'
+import { apiRatelimit } from './utils/ddos_protection';
+import * as socketIO from './utils/socket';
 
 const app = express();
+const httpServer = http.createServer(app);
+const options = {
+    cors: {
+        origin: "http://localhost:4200",
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
+    }
+ };
+const io = socketIO.default.init(httpServer, options); 
 
-const port = process.env.DB_PORT || 8080;
+const port = process.env.SERVER_PORT || 8080;
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
   
@@ -39,4 +49,10 @@ app.use('/site', siteRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 
-app.listen(port);
+const server = httpServer.listen(port);
+io.on('connection', socket => {
+    console.log('Client connected');
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});

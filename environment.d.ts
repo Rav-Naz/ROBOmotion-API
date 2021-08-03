@@ -6,6 +6,7 @@ declare global {
             DB_PASSWORD: string;
             DB_HOST: string;
             DB_PORT: string;
+            SERVER_PORT:string;
             DB_DATABASE_NAME: string;
             WS_STREAMLINK: string;
         }
