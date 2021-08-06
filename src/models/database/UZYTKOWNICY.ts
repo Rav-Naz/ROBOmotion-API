@@ -24,26 +24,27 @@ export class UZYTKOWNICY{
         if ((typeof body.uzytkownik_typ !== "number" || body.uzytkownik_typ.toString().length > 1) && typeof body.uzytkownik_typ !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_typ is not valid');
         }
-        if ((typeof body.imie !== "string" || body.imie.length > 40) && typeof body.imie !== "undefined") {
+        if ((typeof body.imie !== "string" || body.imie.length > 40 || body.imie.length < 2) && typeof body.imie !== "undefined") {
             throw new Error('UZYTKOWNICY.imie is not valid');
         }
-        if ((typeof body.nazwisko !== "string" || body.nazwisko.length > 40) && typeof body.nazwisko !== "undefined") {
+        if ((typeof body.nazwisko !== "string" || body.nazwisko.length > 40 || body.nazwisko.length < 2) && typeof body.nazwisko !== "undefined") {
             throw new Error('UZYTKOWNICY.nazwisko is not valid');
         }
-        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 15) && typeof body.numer_telefonu !== "undefined" && typeof body.kod_pocztowy !== "object") {
+        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 15 || body.numer_telefonu.length < 9) && typeof body.numer_telefonu !== "undefined" && typeof body.kod_pocztowy !== "object") {
             throw new Error('UZYTKOWNICY.numer_telefonu is not valid');
         }
-        if ((typeof body.email !== "string" || body.email.length > 100) && typeof body.email !== "undefined") {
+        const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if ((typeof body.email !== "string" || body.email.length > 100 || body.email.length < 2 || !emailRegexp.test(body.email)) && typeof body.email !== "undefined") {
             throw new Error('UZYTKOWNICY.email is not valid');
         }
-        if ((typeof body.haslo !== "string" || body.haslo.length > 64) && typeof body.haslo !== "undefined") {
+        if ((typeof body.haslo !== "string" || body.haslo.length > 64 || body.haslo.length < 6) && typeof body.haslo !== "undefined") {
             throw new Error('UZYTKOWNICY.haslo is not valid');
         }
         if ((typeof body.kod_pocztowy !== "string" || body.kod_pocztowy.length > 6) && typeof body.kod_pocztowy !== "undefined" && typeof body.kod_pocztowy !== "object") {
             throw new Error('UZYTKOWNICY.kod_pocztowy is not valid');
         }
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {
-            throw new Error('UZYTKOWNICY.kod_pocztowy is not valid');
+            throw new Error('UZYTKOWNICY.data_rejestracji is not valid');
         }
         if (typeof body.czy_potwierdzony_email !== "boolean" && typeof body.czy_potwierdzony_email !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_email is not valid');

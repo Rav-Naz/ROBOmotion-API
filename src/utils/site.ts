@@ -1,6 +1,7 @@
 import express from 'express';
 import { Success } from '../responses/success';
 import { env } from 'process';
+import * as socketIO from '../utils/socket';
 
 const router = express.Router();
 

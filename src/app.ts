@@ -32,6 +32,7 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 app.use(apiRatelimit); //DDOS prtection
 
 app.use(bodyParser.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true }))
 
 app.use(morgan('short'));
 
@@ -50,9 +51,3 @@ app.use('/site', siteRoutes);
 app.use(emptyRoutes); //When can't resolve the path
 
 const server = httpServer.listen(port);
-io.on('connection', socket => {
-    console.log('Client connected');
-    socket.on('disconnect', () => {
-        console.log('Client disconnected');
-    });
-});
