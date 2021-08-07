@@ -139,7 +139,7 @@ router.get('/getPosition/:stanowisko_id', (req, res, next) => {
     })
 })
 
-router.get('/getPositions', (req, res, next) => {
+router.get('/getPositions',(req, res, next) => {
 
     db.query("CALL `STANOWISKA_pobierzWszystkieStanowiska(*)`();", (err, results, fields) => {
 
@@ -150,7 +150,6 @@ router.get('/getPositions', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage)
             return;
         }
-
         Success.OK(res, results[0]);
     })
 })
@@ -250,6 +249,7 @@ router.post('/loginUser', (req, res, next) => {
     const body = req.body;
     const email = body?.email;
     const haslo = body?.haslo;
+    console.log(req.next)
     try {
         UZYTKOWNICY.validator({email: email, haslo: haslo});
     } catch (err) {
