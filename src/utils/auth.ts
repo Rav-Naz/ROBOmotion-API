@@ -1,7 +1,7 @@
 import { ClientError } from './../responses/client_errors';
 import express from 'express';
-// (req: express.Request, res: express.Response, next: express.NextFunction)
-const secret = process.env.JWT_SECRET || Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 32);
+import sha256 from 'sha256';
+
 export default {
     authorize: (typ: number) => {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -17,5 +17,8 @@ export default {
             }
             next();
         }
+    },
+    hashPassword(haslo: string): String {
+        return sha256(haslo);
     }
 }
