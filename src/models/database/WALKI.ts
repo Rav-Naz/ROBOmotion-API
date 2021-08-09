@@ -27,7 +27,7 @@ export class WALKI {
         if ((typeof body.wygrane_rundy_robot2 !== "number" || body.wygrane_rundy_robot2.toString().length > 2) && typeof body.wygrane_rundy_robot2 !== "undefined" && typeof body.wygrane_rundy_robot2 !== "object") {
             throw new Error('WALKI.wygrane_rundy_robot2 is not valid');
         }
-        if (typeof body.czas_zakonczenia !== "string" && typeof body.wygrane_rundy_robot2 !== "undefined" && typeof body.czas_zakonczenia !== "object") {
+        if (typeof body.czas_zakonczenia !== "string" && typeof body.czas_zakonczenia !== "undefined" && typeof body.czas_zakonczenia !== "object") {
             throw new Error('WALKI.czas_zakonczenia is not valid');
         }
         if ((typeof body.stanowisko_id !== "number" || body.stanowisko_id.toString().length > 3) && typeof body.stanowisko_id !== "undefined") {
