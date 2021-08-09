@@ -51,7 +51,9 @@ router.get('/checkIfUserIsConstructorOfRobot/:uzytkownik_uuid/:robot_uuid', (req
         return;
     }
 
-    KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid).catch(() => {}).then((result) => {
+    KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid).catch(() => {
+        ServerError.internalServerError(res);
+    }).then((result) => {
         Success.OK(res, Object(result));
     });
 });
@@ -285,7 +287,7 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
         const konstruktor = {
             konstruktor_id: results[1][0].konstruktor_id
         };
-        socketIO.default.getIO().to("judge").to(`users/${uzytkownik_uuid}`).emit("newRobot", {robot, konstruktor});
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("newRobot", {robot, konstruktor});
         Success.OK(res, {robot, konstruktor});
     });
 });
@@ -327,7 +329,7 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
             nazwa: nazwa,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to("judge").to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("updateRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("updateRobot", robot);
         Success.OK(res, robot);
     });
 });
@@ -366,7 +368,7 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
             robot_uuid: robot_uuid,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to("judge").to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("deleteRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("deleteRobot", robot);
         Success.OK(res, robot);
     });
 });
@@ -475,7 +477,7 @@ router.delete('/deleteUser', access.default.canModify,  async (req, res, next) =
             isSucces: results[0][0].pIsSucces
         };
         
-        socketIO.default.getIO().to("judge").to(`users/${uzytkownik_uuid}`).emit("deleteUser", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("deleteUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });
