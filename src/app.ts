@@ -26,7 +26,10 @@ const options = {
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
     }
  };
-const io = socketIO.default.init(httpServer, options); 
+const io = socketIO.default.init(httpServer, options);
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
 
 const port = process.env.SERVER_PORT || 8080;
 

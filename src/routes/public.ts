@@ -53,10 +53,10 @@ router.get('/isItFightingCategory/:kategoria_id', (req, res, next) => {
 
         
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -69,10 +69,10 @@ router.get('/getAllCategories', (req, res, next) => {
     db.query("CALL `KATEGORIE_pobierzWszystkieKategorie(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -92,10 +92,10 @@ router.get('/getRobot/:robot_uuid', (req, res, next) => {
     db.query("CALL `ROBOTY_pobierzRobota(*)`(?);", [robot_uuid], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -108,10 +108,10 @@ router.get('/getAllRobots', (req, res, next) => {
     db.query("CALL `ROBOTY_pobierzWszystkieRoboty(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -131,10 +131,10 @@ router.get('/getJudgesForThePosition/:stanowisko_id', (req, res, next) => {
     db.query("CALL `STANOWISKA_pobierzSedziowDlaStanowiska(*)`(?);", [stanowisko_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -154,10 +154,10 @@ router.get('/getPosition/:stanowisko_id', (req, res, next) => {
     db.query("CALL `STANOWISKA_pobierzStanowisko(*)`(?);", [stanowisko_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -170,10 +170,10 @@ router.get('/getPositions',(req, res, next) => {
     db.query("CALL `STANOWISKA_pobierzWszystkieStanowiska(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
         Success.OK(res, results[0]);
@@ -196,10 +196,10 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
     db.query(" CALL `STANOWISKA_sprawdzCzyRobotMozeNaTymStanowisku(*)`(?, ?, @p2, ?);", [robot_uuid, kategoria_id, stanowisko_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -223,10 +223,10 @@ router.post('/registerUser', (req, res, next) => {
     db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString()], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
         // 
@@ -259,13 +259,12 @@ router.get('/confirmCode/:uzytkownik_uuid/:kod/:czy_na_telefon', (req, res, next
     db.query("CALL `POTWIERDZENIA_potwierdzKod(*)`(?, ?, @p2, ?);", [uzytkownik_uuid, kod, czy_na_telefon], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-
         Success.OK(res, results[0][0]);
     });
 });
@@ -285,10 +284,10 @@ router.post('/loginUser', (req, res, next) => {
     db.query("CALL `UZYTKOWNICY_zalogujUzytkownika(*)`(?, ?, @p2)", [email, auth.hashPassword(haslo).toString()], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -326,10 +325,10 @@ router.get('/getAllFights', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWalki(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -350,10 +349,10 @@ router.get('/getAllFightsForGroup/:grupa_id', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWalkiDlaGrupy(*)`(?);", [grupa_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -374,10 +373,10 @@ router.get('/getAllFightsForCategory/:kategoria_id', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWalkiDlaKategorii(*)`(?);", [kategoria_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -398,10 +397,10 @@ router.get('/getAllFightsForRobot/:robot_uuid', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWalkiDlaRobota(*)`(?);", [robot_uuid], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -422,10 +421,10 @@ router.get('/getAllFightsForPosiotion/:stanowisko_id', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWalkiDlaStanowiska(*)`(?);", [stanowisko_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -443,17 +442,16 @@ router.get('/getWinnersForGroup/:grupa_id', (req, res, next) => {
         return;
     }
 
-    db.query("CALL `WALKI_pobierzWalkiDlaGrupy(*)`(?);", [grupa_id], (err, results, fields) => {
+    db.query("CALL `WALKI_pobierzWygranychDlaGrupy(*)`(?);", [grupa_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-
-        Success.OK(res, results[1]);
+        Success.OK(res, results[0]);
     });
 });
 
@@ -470,10 +468,10 @@ router.get('/getWinnersForCategory/:kategoria_id', (req, res, next) => {
     db.query("CALL `WALKI_pobierzWygranychDlaKategorii(*)`(?);", [kategoria_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -486,10 +484,10 @@ router.get('/getBestTimes', (req, res, next) => {
     db.query("CALL `WYNIKI_CZASOWE_pobierzNajlepszeWyniki(*)`();",  (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -502,10 +500,10 @@ router.get('/getAllTimes', (req, res, next) => {
     db.query("CALL `WYNIKI_CZASOWE_pobierzWszystkieWyniki(*)`();",  (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -526,10 +524,10 @@ router.get('/getAllTimesForCategory/:kategoria_id', (req, res, next) => {
     db.query("CALL `WYNIKI_CZASOWE_pobierzWynikiDlaKategorii(*)`(?);", [kategoria_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -550,10 +548,10 @@ router.get('/getAllTimesForRobot/:robot_uuid', (req, res, next) => {
     db.query("CALL `WYNIKI_CZASOWE_pobierzWynikiRobota(*)`(?);", [robot_uuid], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 
@@ -574,10 +572,10 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
     db.query("CALL `WYNIKI_CZASOWE_pobierzWynikiDlaStanowiska(*)`(?);", [stanowisko_id], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.message);
+            ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            ServerError.internalServerError(res, err.message);
+            ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
 

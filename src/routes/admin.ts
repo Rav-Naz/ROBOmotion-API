@@ -199,7 +199,7 @@ router.post('/addFightAndRobots', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const walka = results[2][0];
+        const walka = results[results.length-2][0];
         socketIO.default.getIO().emit("addRobotToFight", walka);
         Success.OK(res, walka);
     });
