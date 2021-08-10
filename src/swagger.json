@@ -2,8 +2,8 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "API for ROBO~motion event",
-        "description": "Full network system to management ROBO~motion event",
+        "title": "API na zawody ROBO~motion",
+        "description": "Pełny system sieciowy do zarządzania zadodami ROBO~motion",
         "license": {
             "name": "MIT",
             "url": "https://opensource.org/licenses/MIT"
@@ -11,31 +11,427 @@
     },
     "host": "localhost:8080",
     "basePath": "",
-    "schemes": ["http"],
+    "schemes": ["http", "https"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "tags": [{
-        "name": "Public",
-        "description": "Endpoints for every user of the system"
-    }],
+            "name": "Publiczne",
+            "description": "Endpointy dla każdego użytkownika systemu"
+        },
+        {
+            "name": "Użytkownik",
+            "description": "Endpointy dla zalogowanych użytkowników"
+        },
+        {
+            "name": "Sędzia",
+            "description": "Endpointy dla wyznaczonych sędziów"
+        },
+        {
+            "name": "Admin",
+            "description": "Endpointy dla administracji"
+        },
+        {
+            "name": "Urządzenia",
+            "description": "Endpointy dla urządzeń"
+        }
+    ],
     "definitions": {
-        "user": {
+        "GRUPY_WALK": {
             "type": "object",
             "properties": {
-                "name": {
-                    "type": "string"
+                "grupa_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "unikalny": true,
+                    "opis": "Identyfikator grupy"
                 },
-                "second": {
-                    "type": "string"
+                "kategoria_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora kategorii"
+                },
+                "nazwa": {
+                    "type": "string",
+                    "maximum": 50,
+                    "opis": "Nazwa własna grupy"
                 }
-
+            }
+        },
+        "KATEGORIE": {
+            "type": "object",
+            "properties": {
+                "kategoria_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "unikalny": true,
+                    "opis": "Identyfikator kategorii"
+                },
+                "nazwa": {
+                    "type": "string",
+                    "maximum": 50,
+                    "opis": "Nazwa własna kategorii"
+                },
+                "rodzaj": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa typ konkurencji (0 WYNIK CZASOWY | 1 WALKA)"
+                }
+            }
+        },
+        "KATEGORIE_ROBOTA": {
+            "type": "object",
+            "properties": {
+                "kategoria_robota_id": {
+                    "type": "number",
+                    "maximum": 7,
+                    "unikalny": true,
+                    "opis": "Identyfikator kategorii robota"
+                },
+                "robot_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora robota"
+                },
+                "kategoria_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora kategorii"
+                }
+            }
+        },
+        "KATEGORIE_STANOWISKA": {
+            "type": "object",
+            "properties": {
+                "kategoria_stanowiska_id": {
+                    "type": "number",
+                    "maximum": 7,
+                    "unikalny": true,
+                    "opis": "Identyfikator kategorii stanowiska"
+                },
+                "stanowisko_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora stanowiska"
+                },
+                "kategoria_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora kategorii"
+                }
+            }
+        },
+        "KONSTRUKTORZY": {
+            "type": "object",
+            "properties": {
+                "konstruktor_id": {
+                    "type": "number",
+                    "maximum": 8,
+                    "unikalny": true,
+                    "opis": "Identyfikator konstruktora"
+                },
+                "uzytkownik_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora użytkownika"
+                },
+                "robot_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora robota"
+                }
+            }
+        },
+        "POTWIERDZENIA": {
+            "type": "object",
+            "properties": {
+                "potwierdzenie_id": {
+                    "type": "number",
+                    "maximum": 7,
+                    "unikalny": true,
+                    "opis": "Identyfikator potwierdzenia"
+                },
+                "uzytkownik_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora użytkownika"
+                },
+                "kod": {
+                    "type": "number",
+                    "maximum": 6,
+                    "unikalny": true,
+                    "opis": "Unikalny kod wysłany do użytkownika w celu potwierdzenia"
+                },
+                "czy_na_telefon": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa gdzie potwierdzenie zostało wysłane (0 EMAIL | 1 SMS)"
+                },
+                "data_waznosci": {
+                    "type": "Date",
+                    "opis": "Data wygaśnięcia ważności kodu potwierdzającego"
+                }
+            }
+        },
+        "ROBOTY": {
+            "type": "object",
+            "properties": {
+                "robot_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "unikalny": true,
+                    "opis": "Identyfikator robota"
+                },
+                "robot_uuid": {
+                    "type": "string",
+                    "maximum": 36,
+                    "unikalny": true,
+                    "opis": "Uniwersalny identyfikator robota"
+                },
+                "nazwa": {
+                    "type": "string",
+                    "maximum": 40,
+                    "opis": "Nazwa własna robota"
+                },
+                "czy_dotarl": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa czy robot dotarł na miejsce. Potwierdzenie jest wystawiane przez sędziego lub administratora na stanowisku rejestracyjnym (0 NIE DOTARŁ | 1 DOTARŁ)"
+                }
+            }
+        },
+        "STANOWISKA": {
+            "type": "object",
+            "properties": {
+                "stanowisko_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "unikalny": true,
+                    "opis": "Identyfikator stanowiska"
+                },
+                "nazwa": {
+                    "type": "string",
+                    "maximum": 50,
+                    "opis": "Nazwa własna stanowiska"
+                }
+            }
+        },
+        "STANOWISKA_SEDZIOWIE": {
+            "type": "object",
+            "properties": {
+                "stanowiska_sedziowie_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "unikalny": true,
+                    "opis": "Identyfikator stanowiska sędziego"
+                },
+                "stanowisko_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora stanowiska"
+                },
+                "uzytkownik_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora użytkownika"
+                }
+            }
+        },
+        "UZYTKOWNICY": {
+            "type": "object",
+            "properties": {
+                "uzytkownik_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "unikalny": true,
+                    "opis": "Identyfikator użytkownika"
+                },
+                "uzytkownik_uuid": {
+                    "type": "string",
+                    "maximum": 36,
+                    "unikalny": true,
+                    "opis": "Uniwersalny identyfikator użytkownika"
+                },
+                "uzytkownik_typ": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa uprawnienia użytkownika (0 UŻYTKOWNIK | 1 SĘDZIA | 2 ADMINISTRATOR)"
+                },
+                "imie": {
+                    "type": "string",
+                    "minimum": 2,
+                    "maximum": 40,
+                    "opis": "Imię użytkownika"
+                },
+                "nazwisko": {
+                    "type": "string",
+                    "minimum": 2,
+                    "maximum": 40,
+                    "opis": "Nazwisko użytkownika"
+                },
+                "numer_telefonu": {
+                    "type": "string",
+                    "minimum": 9,
+                    "maximum": 15,
+                    "opis": "Numer kontaktowy do użytkownika"
+                },
+                "email": {
+                    "type": "string",
+                    "minimum": 2,
+                    "maximum": 100,
+                    "opis": "Email użytkownika",
+                    "pattern": "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/"
+                },
+                "haslo": {
+                    "type": "string",
+                    "minimum": 6,
+                    "maximum": 64,
+                    "opis": "Hasło użytkownika (zaszyfrowane SHA256)"
+                },
+                "kod_pocztowy": {
+                    "type": "string",
+                    "maximum": 6,
+                    "opis": "Kod pocztowy użytkownika"
+                },
+                "data_rejestracji": {
+                    "type": "Date",
+                    "opis": "Data założenia konta użytkownika"
+                },
+                "czy_potwierdzony_email": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa czy użytkownik potwierdził email (0 NIE | 1 TAK)"
+                },
+                "czy_potwierdzony_numer_telefonu": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa czy użytkownik potwierdził numer telefonu (0 NIE | 1 TAK)"
+                }
+            }
+        },
+        "WALKI": {
+            "type": "object",
+            "properties": {
+                "walka_id": {
+                    "type": "number",
+                    "maximum": 7,
+                    "unikalny": true,
+                    "opis": "Identyfikator walki"
+                },
+                "robot1_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora robota 1"
+                },
+                "robot2_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora robota 2"
+                },
+                "wygrane_rundy_robot1": {
+                    "type": "number",
+                    "maximum": 2,
+                    "opis": "Wygrane rundy podczas walki przez robota 1"
+                },
+                "wygrane_rundy_robot2": {
+                    "type": "number",
+                    "maximum": 2,
+                    "opis": "Wygrane rundy podczas walki przez robota 2"
+                },
+                "czas_zakonczenia": {
+                    "type": "Date",
+                    "opis": "Czas zakończenia walki"
+                },
+                "stanowisko_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora stanowiska"
+                },
+                "nastepna_walka_id": {
+                    "type": "number | null",
+                    "maximum": 7,
+                    "opis": "Referencja do identyfikatora następnej walki"
+                },
+                "grupa_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora grupy"
+                }
+            }
+        },
+        "WIADOMOSCI": {
+            "type": "object",
+            "properties": {
+                "wiadomosc_id": {
+                    "type": "number",
+                    "maximum": 10,
+                    "unikalny": true,
+                    "opis": "Identyfikator wiadomości"
+                },
+                "uzytkownik_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora użytkownika"
+                },
+                "tresc": {
+                    "type": "string",
+                    "maximum": 500,
+                    "opis": "Treść wiadomości do użytkownika"
+                },
+                "czy_wyslane": {
+                    "type": "number",
+                    "maximum": 1,
+                    "opis": "Określa czy wiadomość już została wysłana przez system (0 NIE | 1 TAK)"
+                },
+                "czas_nadania": {
+                    "type": "Date",
+                    "opis": "Czas zarejestrowania wiadomości do wysłania"
+                },
+                "czas_wyslania": {
+                    "type": "Date",
+                    "opis": "Czas wysłania wiadomości"
+                }
+            }
+        },
+        "WYNIKI_CZASOWE": {
+            "type": "object",
+            "properties": {
+                "wynik_id": {
+                    "type": "number",
+                    "maximum": 7,
+                    "unikalny": true,
+                    "opis": "Identyfikator wyniku czasowego"
+                },
+                "robot_id": {
+                    "type": "number",
+                    "maximum": 6,
+                    "opis": "Referencja do identyfikatora robota"
+                },
+                "czas_przejazdu": {
+                    "type": "number",
+                    "maximum": 7,
+                    "opis": "Czas pokonania trasy przez robota"
+                },
+                "czas_zakonczenia": {
+                    "type": "Date",
+                    "opis": "Czas zakończenia przejazdu"
+                },
+                "stanowisko_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora stanowiska"
+                },
+                "kategoria_id": {
+                    "type": "number",
+                    "maximum": 3,
+                    "opis": "Referencja do identyfikatora kategorii"
+                }
             }
         }
     },
     "paths": {
         "/public": {
             "get": {
-                "tags": ["Public"],
+                "tags": ["Publiczne"],
                 "summary": "Get all robots",
                 "responses": {
                     "200": {
@@ -46,7 +442,7 @@
         },
         "/public/hello": {
             "get": {
-                "tags": ["Public"],
+                "tags": ["Publiczne"],
                 "summary": "Get all robots v2",
                 "responses": {
                     "200": {

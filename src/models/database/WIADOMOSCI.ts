@@ -3,7 +3,7 @@ export class WIADOMOSCI{
     wiadomosc_id?: number | undefined;
     uzytkownik_id?: number | undefined;
     tresc?: string | undefined;
-    czy_wyslane?: Boolean | undefined;
+    czy_wyslane?: number | undefined;
     czas_nadania?: Date | undefined;
     czas_wyslania?: Date | null| undefined;
 
@@ -18,7 +18,7 @@ export class WIADOMOSCI{
         if ((typeof body.tresc !== "string" || body.tresc.length > 500) && typeof body.tresc !== "undefined") {
             throw new Error('WIADOMOSCI.tresc is not valid');
         }
-        if (typeof body.czy_wyslane !== "boolean" && typeof body.czy_wyslane !== "undefined") {
+        if ((typeof body.czy_wyslane !== "number" || body.czy_wyslane.toString().length > 1) && typeof body.czy_wyslane !== "undefined") {
             throw new Error('WIADOMOSCI.czy_wyslane is not valid');
         }
         if (typeof body.czas_nadania !== "string" && typeof body.czas_nadania !== "undefined") {

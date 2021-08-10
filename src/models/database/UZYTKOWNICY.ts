@@ -10,8 +10,8 @@ export class UZYTKOWNICY{
     haslo?: string | undefined;
     kod_pocztowy?: string | null | undefined;
     data_rejestracji?: Date | undefined;
-    czy_potwierdzony_email?: Boolean | undefined;
-    czy_potwierdzony_numer_telefonu?: Boolean | undefined;
+    czy_potwierdzony_email?: number | undefined;
+    czy_potwierdzony_numer_telefonu?: number | undefined;
 
 
     static validator(body: UZYTKOWNICY = {uzytkownik_id: undefined, uzytkownik_uuid: undefined, uzytkownik_typ: undefined, imie: undefined, nazwisko: undefined, numer_telefonu: undefined, email: undefined, haslo: undefined, czy_potwierdzony_email: undefined, czy_potwierdzony_numer_telefonu: undefined, data_rejestracji: undefined, kod_pocztowy: undefined}): void  {
@@ -46,10 +46,10 @@ export class UZYTKOWNICY{
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {
             throw new Error('UZYTKOWNICY.data_rejestracji is not valid');
         }
-        if (typeof body.czy_potwierdzony_email !== "boolean" && typeof body.czy_potwierdzony_email !== "undefined") {
+        if ((typeof body.czy_potwierdzony_email !== "number" || body.czy_potwierdzony_email.toString().length > 1) && typeof body.czy_potwierdzony_email !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_email is not valid');
         }
-        if (typeof body.czy_potwierdzony_numer_telefonu !== "boolean" && typeof body.czy_potwierdzony_numer_telefonu !== "undefined") {
+        if ((typeof body.czy_potwierdzony_numer_telefonu !== "number" || body.czy_potwierdzony_numer_telefonu.toString().length > 1) && typeof body.czy_potwierdzony_numer_telefonu !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_numer_telefonu is not valid');
         }
     }
