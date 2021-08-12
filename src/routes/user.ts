@@ -39,6 +39,36 @@ function KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res: express.Respons
     });
 }
 
+export function KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora(uzytkownik_uuid: string, res?: express.Response): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+        try {
+            UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        } catch (err) {
+            if (res) {
+                ClientError.notAcceptable(res, err.message);
+            }
+            reject();
+        }
+
+        db.query("CALL `KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora(U)`(?);", [uzytkownik_uuid], (err, results, fields) => {
+            if (err?.sqlState === '45000') {
+                if (res) {
+                    ClientError.badRequest(res, err.sqlMessage);
+                }
+                reject();
+                return;
+            } else if (err) {
+                if (res) {
+                    ServerError.internalServerError(res, err.sqlMessage);
+                }
+                reject();
+                return;
+            }
+            resolve(results[0]);
+        });
+    });
+}
+
 router.get('/checkIfUserIsConstructorOfRobot/:uzytkownik_uuid/:robot_uuid', (req, res, next) => {
 
     const robot_uuid = req.params?.robot_uuid;
@@ -57,6 +87,7 @@ router.get('/checkIfUserIsConstructorOfRobot/:uzytkownik_uuid/:robot_uuid', (req
         Success.OK(res, Object(result));
     });
 });
+
 
 router.post('/addRobotCategory', access.default.canModify, async (req, res, next) => {
 
@@ -99,7 +130,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
             kategoria_id: kategoria_id,
             isSucces: results[0][0].pIsSucces
         };
-
+        console.log(kategoria_robota)
         socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("addRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
@@ -186,7 +217,7 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
             konstruktor_id: results[0][0].konstruktor_id
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("addConstructor", utworzony_konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("addConstructor", utworzony_konstruktor);
         Success.OK(res, utworzony_konstruktor);
     });
 });
@@ -249,7 +280,6 @@ router.post('/addConfirmationCodeToPhone', async (req, res, next) => {
             wiadomosc_id: results[0][0].wiadomosc_id
         };
 
-        socketIO.default.getIO().to("messenger").emit("newMessage");
         Success.OK(res, wiadomosc);
     });
 });
@@ -331,6 +361,23 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
         };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("updateRobot", robot);
         Success.OK(res, robot);
+    });
+});
+
+router.get('/getAllRobotsOfUser', (req, res, next) => {
+
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora(uzytkownik_uuid, res).catch(() => {
+        ServerError.internalServerError(res);
+    }).then((result) => {
+        Success.OK(res, Object(result));
     });
 });
 

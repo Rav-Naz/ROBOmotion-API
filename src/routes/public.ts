@@ -10,7 +10,6 @@ import express from 'express';
 import db from '../utils/database';
 import { ClientError } from '../responses/client_errors';
 import { Success } from '../responses/success';
-import * as socketIO from '../utils/socket';
 import * as JWT from '../utils/jwt';
 import auth from '../utils/auth';
 
@@ -240,7 +239,6 @@ router.post('/registerUser', (req, res, next) => {
             nazwisko: nazwisko,
             email: email
         };
-        socketIO.default.getIO().to("judge").emit("registerUser", nowyUzytkownik);
         
         Success.OK(res, nowyUzytkownik);
     });

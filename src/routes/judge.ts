@@ -146,7 +146,8 @@ router.post('/setFightResult', (req, res, next) => {
             isSucces: results[0][0].pIsSucces,
         }
 
-        socketIO.default.getIO().to("fights").to(`fights/${walka_id}`).to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("setFightResult", walka);
+        socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("setFightResult", walka);
+        socketIO.default.getIO().emit("setFightResult", walka);
         Success.OK(res, walka);
     });
 });
@@ -213,7 +214,8 @@ router.post('/setTimeResult', (req, res, next) => {
             kategoria_id: kategoria_id
         }
 
-        socketIO.default.getIO().to("times").to(`robots/${robot_uuid}`).emit("setTimeResult", wynik);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("setTimeResult", wynik);
+        socketIO.default.getIO().emit("setTimeResult", wynik);
         Success.OK(res, wynik);
     });
 });
@@ -248,7 +250,8 @@ router.put('/updateTimeResult', (req, res, next) => {
             isSucces: results[0][0].pIsSucces
         }
 
-        socketIO.default.getIO().to("times").to(`robots/${wynik.robot_uuid}`).emit("updateTimeResult", wynik);
+        socketIO.default.getIO().to(`robots/${wynik.robot_uuid}`).emit("updateTimeResult", wynik);
+        socketIO.default.getIO().emit("updateTimeResult", wynik);
         Success.OK(res, wynik);
     });
 });
