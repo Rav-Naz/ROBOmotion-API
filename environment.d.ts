@@ -10,6 +10,7 @@ declare global {
             DB_DATABASE_NAME: string;
             WS_STREAMLINK: string;
             JWT_SECRET: string;
+            DEVICE_SECRET: string;
         }
     }
 }

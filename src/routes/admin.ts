@@ -261,45 +261,6 @@ router.delete('/removeFight', (req, res, next) => {
     });
 });
 
-router.get('/getRecipients', (req, res, next) => {
-    
-    db.query("CALL `WIADOMOSCI_pobierzAdresatow(A)`();", (err, results, fields) => {
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-
-        Success.OK(res, results[0]);
-    });
-});
-
-router.post('/confirmSendMessage', (req, res, next) => {
-
-    const body = req?.body;
-    const wiadomosc_id = Number(body?.wiadomosc_id);
-
-    try {
-        WIADOMOSCI.validator({wiadomosc_id: wiadomosc_id});
-    } catch (err) {
-        ClientError.notAcceptable(res, err.message);
-    }
-    
-    db.query("CALL `WIADOMOSCI_potwierdzWyslanieWiadomosci(A)`(?,@p2);", [wiadomosc_id], (err, results, fields) => {
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-
-        Success.OK(res, results[0][0]);
-    });
-});
-
 router.post('/sendPrivateMessage', (req, res, next) => {
 
     const body = req?.body;

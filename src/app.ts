@@ -13,6 +13,7 @@ import userRoutes from './routes/user';
 import judgeRoutes from './routes/judge';
 import adminRoutes from './routes/admin';
 import emptyRoutes from './routes/empty';
+import deviceRoutes from './routes/device';
 import { apiRatelimit } from './utils/ddos_protection';
 import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
@@ -53,7 +54,8 @@ app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
 app.use('/user',JWT.default.verify, auth.default.authorize(0), userRoutes);
 app.use('/judge',JWT.default.verify, auth.default.authorize(1), judgeRoutes);
-app.use('/admin',JWT.default.verify,auth.default.authorize(2), adminRoutes);
+app.use('/admin',JWT.default.verify, auth.default.authorize(2), adminRoutes);
+app.use('/device', auth.default.authorize(3), deviceRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 

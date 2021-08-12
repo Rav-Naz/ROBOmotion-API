@@ -12,7 +12,7 @@ export class ROBOTY{
         if ((typeof body.robot_uuid !== "string" || body.robot_uuid.length != 36) && typeof body.robot_uuid !== "undefined") {
             throw new Error('ROBOTY.robot_uuid is not valid');
         }
-        if ((typeof body.nazwa !== "string" || body.nazwa.length > 40) && typeof body.nazwa !== "undefined") {
+        if ((typeof body.nazwa !== "string" || body.nazwa.length > 40 || body.nazwa.length < 2) && typeof body.nazwa !== "undefined") {
             throw new Error('ROBOTY.nazwa is not valid');
         }
         if ((typeof body.czy_dotarl !== "number" || body.czy_dotarl.toString().length > 1) && typeof body.czy_dotarl !== "undefined") {

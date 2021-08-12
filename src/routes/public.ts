@@ -220,6 +220,7 @@ router.post('/registerUser', (req, res, next) => {
         return;
     }
 
+
     db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString()], (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
