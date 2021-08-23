@@ -12,6 +12,10 @@ import { ClientError } from '../responses/client_errors';
 import { Success } from '../responses/success';
 import * as JWT from '../utils/jwt';
 import auth from '../utils/auth';
+import Handlebars from 'handlebars';
+import * as Nodemailer from "../utils/nodemailer";
+import fs from 'fs';
+import path from 'path';
 
 const router = express.Router();
 
@@ -118,7 +122,7 @@ router.get('/getAllRobots', (req, res, next) => {
     });
 });
 
-router.get('/getJudgesForThePosition/:stanowisko_id', (req, res, next) => {
+router.get('/getRefereesForThePosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
@@ -206,6 +210,9 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
     });
 });
 
+const registerEmailTemplatePath = 'src/views/email/register.hbs';
+var registerEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePath), 'utf8'));
+
 router.post('/registerUser', (req, res, next) => {
     const body = req.body;
     const imie = body?.imie;
@@ -220,7 +227,7 @@ router.post('/registerUser', (req, res, next) => {
     }
 
 
-    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString()], (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString()], async (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -229,9 +236,22 @@ router.post('/registerUser', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        // 
-        //TODO: Dodać wysyłanie kodu na email (results[0][0].kod)
-        //
+
+    
+        var options = (email: string, locals?: object) => {
+            return {
+                from: `ROBO~motion <${process.env.EMAIL_FROM_ADDR}>`,
+                to: email,
+                subject: 'Aktywacja konta',
+                html: registerEmailTemplate(locals) 
+            };
+          };
+        const result = await Nodemailer.default.getTransporter().sendMail(
+            options(email, {
+                LINK: "https://alexanderpaterson.com/posts/use-handlebars-to-send-great-emails-from-node-applications"
+            })
+        );
+
         const nowyUzytkownik = {
             uzytkownik_id: results[1][0].uzytkownik_id,
             uzytkownik_uuid: results[1][0].uzytkownik_uuid,

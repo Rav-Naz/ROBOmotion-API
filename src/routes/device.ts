@@ -47,5 +47,20 @@ router.get('/getRecipients', (req, res, next) => {
     });
 });
 
+router.get('/removeJunks', (req, res, next) => {
+    
+    db.query("CALL `_removeJunks`();", (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res);
+    });
+});
+
 
 export default router;

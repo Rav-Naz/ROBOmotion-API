@@ -10,7 +10,7 @@ dotenv.config();
 import publicRoutes from './routes/public';
 import siteRoutes from './utils/site';
 import userRoutes from './routes/user';
-import judgeRoutes from './routes/judge';
+import refereeRoutes from './routes/referee';
 import adminRoutes from './routes/admin';
 import emptyRoutes from './routes/empty';
 import deviceRoutes from './routes/device';
@@ -18,6 +18,7 @@ import { apiRatelimit } from './utils/ddos_protection';
 import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
+import * as Nodemailer from './utils/nodemailer'
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -27,7 +28,9 @@ const options = {
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
     }
  };
+
 const io = socketIO.default.init(httpServer, options);
+const nodemailer = Nodemailer.default.init();
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -53,7 +56,7 @@ app.use((req, res, next) => { //CORS
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
 app.use('/user',JWT.default.verify, auth.default.authorize(0), userRoutes);
-app.use('/judge',JWT.default.verify, auth.default.authorize(1), judgeRoutes);
+app.use('/referee',JWT.default.verify, auth.default.authorize(1), refereeRoutes);
 app.use('/admin',JWT.default.verify, auth.default.authorize(2), adminRoutes);
 app.use('/device', auth.default.authorize(3), deviceRoutes);
 

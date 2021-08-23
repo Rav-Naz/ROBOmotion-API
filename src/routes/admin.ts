@@ -1,3 +1,4 @@
+import { KATEGORIE } from './../models/database/KATEGORIE';
 import { WYNIKI_CZASOWE } from './../models/database/WYNIKI_CZASOWE';
 import { UZYTKOWNICY } from './../models/database/UZYTKOWNICY';
 import { WIADOMOSCI } from './../models/database/WIADOMOSCI';
@@ -148,7 +149,7 @@ router.put('/confirmArrival', (req, res, next) => {
             return;
         }
         const robot = results[0][0];
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("judge").to("admin").emit("newArrival", robot);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("newArrival", robot);
         Success.OK(res, robot);
     });
 });
@@ -317,5 +318,53 @@ router.delete('/deleteTimeResult', (req, res, next) => {
     });
 });
 
+router.post('/createGroupsFromCategory', (req, res, next) => {
+
+    const body = req?.body;
+    const kategoria_id = Number(body?.kategoria_id);
+    const stanowiskaLista = Array(body?.stanowiskaLista);
+    const iloscDoFInalu = Number(body?.iloscDoFinalu);
+    const nazwyGrup = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+
+    try {
+        KATEGORIE.validator({kategoria_id: kategoria_id});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    //sprawdzenie stanowiska pod względem kategorii
+
+    //pobranie robotow do ustawienia
+
+    //sprawdzenie czy ilość stanowisk <= ilość do finalu <= ilość robotów
+    
+    //sprawdzenie czy ilosc do finalu, ilosc stanowisk 2^n
+
+    //DRZEWKO FINAŁU
+        //utwórz grupe finałową
+        //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
+        
+    //ELIMINACJE
+        //podziel roboty na grupy (losowo), ilością równe ilości do finału
+        //utwórz grupę eliminacyjną + literka
+            //w każdej grupie ustaw roboty, przeciwko sobie
+    
+    // db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [uzytkownik_uuid, tresc], (err, results, fields) => {
+    //     if (err?.sqlState === '45000') {
+    //         ClientError.badRequest(res, err.sqlMessage);
+    //         return;
+    //     } else if (err) {
+    //         ServerError.internalServerError(res, err.sqlMessage);
+    //         return;
+    //     }
+    //     const wiadomosc = {
+    //         wiadomosc_id: results[0][0].wiadomosc_id,
+    //         uzytkownik_uuid: uzytkownik_uuid,
+    //         tresc: tresc
+    //     }
+    //     Success.OK(res, wiadomosc);
+    // });
+});
 
 export default router;

@@ -11,6 +11,10 @@ declare global {
             WS_STREAMLINK: string;
             JWT_SECRET: string;
             DEVICE_SECRET: string;
+            EMAIL_FROM_ADDR: string;
+            EMAIL_USER: string;
+            EMAIL_USER_PASS: string;
+            EMAIL_HOST: string;
         }
     }
 }

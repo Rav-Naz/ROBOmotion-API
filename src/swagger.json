@@ -766,7 +766,7 @@
                 }
             }
         },
-        "/public/getJudgesForThePosition/{stanowisko_id}": {
+        "/public/getRefereesForThePosition/{stanowisko_id}": {
             "get": {
                 "tags": ["Publiczne"],
                 "summary": "Zwraca wszystkich sędziów dla podanego stanowiska",
@@ -4912,7 +4912,7 @@
 
 
 
-        "/judge/checkIfRobotHasCategory/{robot_uuid}/{kategoria_id}": {
+        "/referee/checkIfRobotHasCategory/{robot_uuid}/{kategoria_id}": {
             "get": {
                 "tags": ["Sędzia"],
                 "summary": "Sprawdza czy robot ma podaną kategorię",
@@ -5036,7 +5036,7 @@
                 }
             }
         },
-        "/judge/checkIfPositionHasCategory/{stanowisko_id}/{kategoria_id}": {
+        "/referee/checkIfPositionHasCategory/{stanowisko_id}/{kategoria_id}": {
             "get": {
                 "tags": ["Sędzia"],
                 "summary": "Sprawdza czy stanowisko ma podaną kategorię",
@@ -5161,7 +5161,7 @@
                 }
             }
         },
-        "/judge/getJudgePositions/{uzytkownik_uuid}": {
+        "/referee/getRefereePositions/{uzytkownik_uuid}": {
             "get": {
                 "tags": ["Sędzia"],
                 "summary": "Zwraca stanowiska podanego sędziego",
@@ -5281,7 +5281,7 @@
                 }
             }
         },
-        "/judge/getUserContactDetails/{uzytkownik_uuid}": {
+        "/referee/getUserContactDetails/{uzytkownik_uuid}": {
             "get": {
                 "tags": ["Sędzia"],
                 "summary": "Zwraca dane kontaktowe danego użytkownika",
@@ -5398,7 +5398,7 @@
                 }
             }
         },
-        "/judge/setFightResult": {
+        "/referee/setFightResult": {
             "post": {
                 "tags": ["Sędzia"],
                 "summary": "Ustawia wynik walki",
@@ -5549,7 +5549,7 @@
                 }
             }
         },
-        "/judge/sendMessageToAllConstructorsOfRobot": {
+        "/referee/sendMessageToAllConstructorsOfRobot": {
             "post": {
                 "tags": ["Sędzia"],
                 "summary": "Wysyła wiadomość do wszystkich konstruktorów robota",
@@ -5672,7 +5672,7 @@
                 }
             }
         },
-        "/judge/setTimeResult": {
+        "/referee/setTimeResult": {
             "post": {
                 "tags": ["Sędzia"],
                 "summary": "Ustawia wynik czasowy",
@@ -5825,7 +5825,7 @@
                 }
             }
         },
-        "/judge/updateTimeResult": {
+        "/referee/updateTimeResult": {
             "put": {
                 "tags": ["Sędzia"],
                 "summary": "Aktualizuje wynik czasowy",
@@ -7398,6 +7398,104 @@
                                             }
                                         }
                                     }
+                                }
+                            }
+                        },
+                        "400": {
+                            "description": "Błędnie określone dane",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "ERROR: Bad Request"
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "Taka wiadomość nie istnieje!"
+                                    }
+                                }
+                            }
+                        },
+                        "401": {
+                            "description": "Dostęp nieautoryzowany",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "ERROR: Bad Request"
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "You have not permission to get the data"
+                                    }
+                                }
+                            }
+                        },
+                        "406": {
+                            "description": "Podane dane nie są właściwe",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "ERROR: Not Acceptable"
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": "WIADOMOSC.wiadomosc_id is not valid"
+                                    }
+                                }
+                            }
+                        },
+                        "500": {
+                            "description": "Błąd serwera",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "ERROR: Internal Server Error"
+                                    },
+                                    "body": {
+                                        "type": "string",
+                                        "example": null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/device/removeJunks": {
+            "get": {
+                "tags": ["Urządzenia"],
+                "summary": "Usuwa niepotrzebne dane z bazy danych",
+                "parameters": [{
+                    "name": "secret",
+                    "description": "Token uwierzytelniający urządzenie",
+                    "in": "headers",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 32,
+                    "maximum": 32,
+                    "example": "kasihdkjashdlkajhsdljhoq18up8duapscdn09a8"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         },

@@ -1,10 +1,10 @@
-import { WYNIKI_CZASOWE } from './../models/database/WYNIKI_CZASOWE';
-import { WIADOMOSCI } from './../models/database/WIADOMOSCI';
-import { WALKI } from './../models/database/WALKI';
-import { UZYTKOWNICY } from './../models/database/UZYTKOWNICY';
-import { STANOWISKA } from './../models/database/STANOWISKA';
-import { KATEGORIE } from './../models/database/KATEGORIE';
-import { ROBOTY } from './../models/database/ROBOTY';
+import { WYNIKI_CZASOWE } from '../models/database/WYNIKI_CZASOWE';
+import { WIADOMOSCI } from '../models/database/WIADOMOSCI';
+import { WALKI } from '../models/database/WALKI';
+import { UZYTKOWNICY } from '../models/database/UZYTKOWNICY';
+import { STANOWISKA } from '../models/database/STANOWISKA';
+import { KATEGORIE } from '../models/database/KATEGORIE';
+import { ROBOTY } from '../models/database/ROBOTY';
 import express from 'express';
 import { ClientError } from '../responses/client_errors';
 import { ServerError } from '../responses/server_errors';
@@ -66,7 +66,7 @@ router.get('/checkIfPositionHasCategory/:stanowisko_id/:kategoria_id', (req, res
     });
 });
 
-router.get('/getJudgePositions/:uzytkownik_uuid', (req, res, next) => {
+router.get('/getRefereePositions/:uzytkownik_uuid', (req, res, next) => {
 
     const uzytkownik_uuid = req.params?.uzytkownik_uuid;
 

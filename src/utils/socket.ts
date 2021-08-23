@@ -22,7 +22,7 @@ export default  {
                     });
                     if (kanaly.length > 0) socket.join(kanaly);
                     socket.join(`users/${uzytkownik_uuid}`)
-                    socket.join(`${uzytkownik_typ === 0 ? 'user' : uzytkownik_typ === 1 ? 'judge' : 'admin'}`);
+                    socket.join(`${uzytkownik_typ === 0 ? 'user' : uzytkownik_typ === 1 ? 'referee' : 'admin'}`);
                 });
             }
             // console.log('Client connected');
