@@ -5,7 +5,7 @@ export class STANOWISKA{
 
 
     static validator(body: STANOWISKA = {stanowisko_id: undefined, nazwa: undefined}): void  {
-        if ((typeof body.stanowisko_id !== "number" || body.stanowisko_id.toString().length > 3) && typeof body.stanowisko_id !== "undefined") {
+        if ((typeof body.stanowisko_id !== "number" || body.stanowisko_id.toString().length > 3 || isNaN(body.stanowisko_id)) && typeof body.stanowisko_id !== "undefined") {
             throw new Error('STANOWISKA.stanowisko_id is not valid');
         }
         if ((typeof body.nazwa !== "string" || body.nazwa.length > 50) && typeof body.nazwa !== "undefined") {

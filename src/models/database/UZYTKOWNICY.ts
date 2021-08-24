@@ -15,13 +15,13 @@ export class UZYTKOWNICY{
 
 
     static validator(body: UZYTKOWNICY = {uzytkownik_id: undefined, uzytkownik_uuid: undefined, uzytkownik_typ: undefined, imie: undefined, nazwisko: undefined, numer_telefonu: undefined, email: undefined, haslo: undefined, czy_potwierdzony_email: undefined, czy_potwierdzony_numer_telefonu: undefined, data_rejestracji: undefined, kod_pocztowy: undefined}): void  {
-        if ((typeof body.uzytkownik_id !== "number" || body.uzytkownik_id.toString().length > 6) && typeof body.uzytkownik_id !== "undefined") {
+        if ((typeof body.uzytkownik_id !== "number" || body.uzytkownik_id.toString().length > 6 || isNaN(body.uzytkownik_id)) && typeof body.uzytkownik_id !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_id is not valid');
         }
         if ((typeof body.uzytkownik_uuid !== "string" || body.uzytkownik_uuid.length != 36) && typeof body.uzytkownik_uuid !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_uuid is not valid');
         }
-        if ((typeof body.uzytkownik_typ !== "number" || body.uzytkownik_typ.toString().length > 1) && typeof body.uzytkownik_typ !== "undefined") {
+        if ((typeof body.uzytkownik_typ !== "number" || body.uzytkownik_typ.toString().length > 1 || isNaN(body.uzytkownik_typ)) && typeof body.uzytkownik_typ !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_typ is not valid');
         }
         if ((typeof body.imie !== "string" || body.imie.length > 40 || body.imie.length < 2) && typeof body.imie !== "undefined") {
@@ -46,10 +46,10 @@ export class UZYTKOWNICY{
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {
             throw new Error('UZYTKOWNICY.data_rejestracji is not valid');
         }
-        if ((typeof body.czy_potwierdzony_email !== "number" || body.czy_potwierdzony_email.toString().length > 1) && typeof body.czy_potwierdzony_email !== "undefined") {
+        if ((typeof body.czy_potwierdzony_email !== "number" || body.czy_potwierdzony_email.toString().length > 1 || isNaN(body.czy_potwierdzony_email)) && typeof body.czy_potwierdzony_email !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_email is not valid');
         }
-        if ((typeof body.czy_potwierdzony_numer_telefonu !== "number" || body.czy_potwierdzony_numer_telefonu.toString().length > 1) && typeof body.czy_potwierdzony_numer_telefonu !== "undefined") {
+        if ((typeof body.czy_potwierdzony_numer_telefonu !== "number" || body.czy_potwierdzony_numer_telefonu.toString().length > 1 || isNaN(body.czy_potwierdzony_numer_telefonu)) && typeof body.czy_potwierdzony_numer_telefonu !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_numer_telefonu is not valid');
         }
     }

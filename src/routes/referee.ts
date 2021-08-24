@@ -14,6 +14,32 @@ import * as socketIO from '../utils/socket';
 
 const router = express.Router();
 
+export function STANOWISKA_czyStanowiskoMaKategorie(res: express.Response, stanowisko_id: number, kategoria_id: number): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+        try {
+            STANOWISKA.validator({ stanowisko_id: stanowisko_id });
+            KATEGORIE.validator({ kategoria_id: kategoria_id })
+        } catch (err) {
+            ClientError.notAcceptable(res, err.message);
+            reject();
+            return;
+        }
+
+        db.query("CALL `STANOWISKA_czyStanowiskoMaKategorie(S)`(?, ?, @p2);", [stanowisko_id, kategoria_id], (err, results, fields) => {
+            if (err?.sqlState === '45000') {
+                ClientError.badRequest(res, err.sqlMessage);
+                reject();
+                return;
+            } else if (err) {
+                ServerError.internalServerError(res, err.sqlMessage);
+                reject();
+                return;
+            }
+            resolve(results[0][0]);
+        });
+    });
+}
+
 router.get('/checkIfRobotHasCategory/:robot_uuid/:kategoria_id', (req, res, next) => {
 
     const robot_uuid = req.params?.robot_uuid;
@@ -53,16 +79,10 @@ router.get('/checkIfPositionHasCategory/:stanowisko_id/:kategoria_id', (req, res
         return;
     }
 
-    db.query("CALL `STANOWISKA_czyStanowiskoMaKategorie(S)`(?, ?, @p2);", [stanowisko_id, kategoria_id], (err, results, fields) => {
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-
-        Success.OK(res, results[0][0]);
+    STANOWISKA_czyStanowiskoMaKategorie(res,stanowisko_id,kategoria_id).catch(() => {
+        return;
+    }).then((result) => {
+        Success.OK(res, result as object);
     });
 });
 

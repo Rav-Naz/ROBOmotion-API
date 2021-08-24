@@ -20,13 +20,16 @@ export default {
         return signedToken;
     },
     verify: (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            let blad = false;
             const token = req.header("token");
             if (!token) {
+                blad = true;
                 ClientError.unauthorized(res, "You have not permission to get the data");
                 return;
             }
             JWT.verify(token, secret, { ignoreExpiration: false }, function(err, decoded) {
                 if (err) {
+                    blad = true;
                     ClientError.unauthorized(res, "You have not permission to get the data");
                     return;
                 }
@@ -34,7 +37,9 @@ export default {
                 delete decoded?.exp;
                 req.query.JWTdecoded = decoded;
             });
-            next();
+            if (!blad) {
+                next();
+            }
     
         }
 }

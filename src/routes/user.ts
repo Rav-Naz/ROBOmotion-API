@@ -22,6 +22,7 @@ function KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res: express.Respons
         } catch (err) {
             ClientError.notAcceptable(res, err.message);
             reject();
+            return;
         }
 
         db.query("CALL `KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(U)`(?, ?, @p2);", [robot_uuid, uzytkownik_uuid], (err, results, fields) => {
@@ -288,7 +289,7 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
 
     const body = req.body;
     const nazwa = body?.nazwa;
-    const kategoria_id = body?.kategoria_id;
+    const kategoria_id = Number(body?.kategoria_id);
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {

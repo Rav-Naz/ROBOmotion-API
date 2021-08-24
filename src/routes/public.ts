@@ -26,9 +26,35 @@ function WALKI_pobierzWalke(res: express.Response, walka_id: number): Promise<ob
         } catch (err) {
             ClientError.notAcceptable(res, err.message);
             reject();
+            return;
         }
 
         db.query("CALL `WALKI_pobierzWalke(*)`(?);", [walka_id], (err, results, fields) => {
+            if (err?.sqlState === '45000') {
+                ClientError.badRequest(res, err.sqlMessage);
+                reject();
+                return;
+            } else if (err) {
+                ServerError.internalServerError(res, err.sqlMessage);
+                reject();
+                return;
+            }
+            resolve(results[0][0]);
+        });
+    });
+}
+
+export function KATEGORIE_czyToKategoriaWalki(res: express.Response, kategoria_id: number): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+        try {
+            KATEGORIE.validator({kategoria_id: kategoria_id})
+        } catch (err) {
+            ClientError.notAcceptable(res, err.message);
+            reject();
+            return;
+        }
+
+        db.query("CALL `KATEGORIE_czyToKategoriaWalki(*)`(?,@p1);", [kategoria_id], (err, results, fields) => {
             if (err?.sqlState === '45000') {
                 ClientError.badRequest(res, err.sqlMessage);
                 reject();
@@ -52,18 +78,10 @@ router.get('/isItFightingCategory/:kategoria_id', (req, res, next) => {
         return;
     }
 
-    db.query("CALL `KATEGORIE_czyToKategoriaWalki(*)`(?,@p1);", [kategoria_id], (err, results, fields) => {
-
-        
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-
-        Success.OK(res, results[0][0]);
+    KATEGORIE_czyToKategoriaWalki(res,kategoria_id).catch(() => {
+        return;
+    }).then((result) => {
+        Success.OK(res, result as object);
     });
 });
 
@@ -333,7 +351,7 @@ router.get('/getFight/:walka_id', (req, res, next) => {
     }
 
     WALKI_pobierzWalke(res,walka_id).catch(() => {
-        ServerError.internalServerError(res);
+        return;
     }).then((result) => {
         Success.OK(res, result as object);
     });
