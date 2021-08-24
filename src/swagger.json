@@ -4160,6 +4160,124 @@
                 }
             }
         },
+        "/user/getAllRobotsOfUser": {
+            "get": {
+                "tags": ["Użytkownik"],
+                "summary": "Pobiera wszystkie roboty użytkownika",
+                "parameters": [{
+                    "name": "token",
+                    "description": "Token uwierzytelniający użytkownika (umieścić w Headers > [token])",
+                    "in": "headers",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 255,
+                    "maximum": 255,
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1enl0a293bmlrX2lkIjoyOCwidXp5dGtvd25pa191dWlkIjoiZWVkMDZhYTgtZmEwMy0xMWViLWJhMGQtYjhjYTNhNWJjN2QwIiwidXp5dGtvd25pa190eXAiOjIsImlhdCI6MTYyODcxNDI0NCwiZXhwIjoxNjI4ODAwNjQ0fQ.Tq2cHnPjtDvwBVEmTxBHPPvrXB5H_6KRBCgJNZqUzps"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "robot_id": {
+                                                "type": "number",
+                                                "example": "39"
+                                            },
+                                            "robot_uuid": {
+                                                "type": "string",
+                                                "example": "81d149d0-d2aa-11eb-82b6-b8ca3a5bc7d0"
+                                            },
+                                            "nazwa_robota": {
+                                                "type": "string",
+                                                "example": "Edytowany"
+                                            },
+                                            "kategorie": {
+                                                "type": "string",
+                                                "example": "7, 9, 8"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki robot nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "ROBOTY.nazwa is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/deleteRobot": {
             "delete": {
                 "tags": ["Użytkownik"],
@@ -4282,7 +4400,7 @@
             }
         },
         "/user/addUserPhoneNumber": {
-            "delete": {
+            "post": {
                 "tags": ["Użytkownik"],
                 "summary": "Dodaje nowy numer telefonu użytkownika",
                 "parameters": [{
@@ -4407,7 +4525,7 @@
             }
         },
         "/user/getUser": {
-            "post": {
+            "get": {
                 "tags": ["Użytkownik"],
                 "summary": "Pobiera dane o użytkowniku",
                 "parameters": [{
@@ -6627,68 +6745,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka grupa nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka grupa nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "GRUPY_WALK.grupa_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "GRUPY_WALK.grupa_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -6810,68 +6928,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka walka nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka walka nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "WALKI.walka_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "WALKI.walka_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -6928,68 +7046,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka walka nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka walka nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "WALKI.walka_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "WALKI.walka_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -7059,68 +7177,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taki użytkownik nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "UZYTKOWNIKCY.uzytkownik_uuid is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "UZYTKOWNIKCY.uzytkownik_uuid is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -7173,68 +7291,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taki użytkownik nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "UZYTKOWNIKCY.uzytkownik_uuid is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "UZYTKOWNIKCY.uzytkownik_uuid is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -7242,7 +7360,133 @@
                 }
             }
         },
+        "/admin/createGroupsFromCategory": {
+            "post": {
+                "tags": ["Admin"],
+                "summary": "Automatycznie tworzy grupę finałową i grupy eliminacyjne na podanych stanowiskach dla wybranej kategorii",
+                "parameters": [{
+                        "name": "token",
+                        "description": "Token uwierzytelniający użytkownika (umieścić w Headers > [token])",
+                        "in": "headers",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 255,
+                        "maximum": 255,
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1enl0a293bmlrX2lkIjoyOCwidXp5dGtvd25pa191dWlkIjoiZWVkMDZhYTgtZmEwMy0xMWViLWJhMGQtYjhjYTNhNWJjN2QwIiwidXp5dGtvd25pa190eXAiOjIsImlhdCI6MTYyODcxNDI0NCwiZXhwIjoxNjI4ODAwNjQ0fQ.Tq2cHnPjtDvwBVEmTxBHPPvrXB5H_6KRBCgJNZqUzps"
+                    },
+                    {
+                        "name": "kategoria_id",
+                        "description": "Identyfikator kategorii",
+                        "required": true,
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 999,
+                        "example": 12
+                    },
+                    {
+                        "name": "stanowiskaLista",
+                        "description": "Lista stanowisk na których odbywać się będą walki (musi być 2^n)",
+                        "required": true,
+                        "type": "array",
+                        "minimum": 0,
+                        "maximum": 999,
+                        "example": [4, 5, 7, 8]
+                    },
+                    {
+                        "name": "iloscDoFinalu",
+                        "description": "Ilość robotów u podnóża drzewka finałowego (musi być 2^n)",
+                        "required": true,
+                        "type": "number",
+                        "minimum": 2,
+                        "maximum": 16,
+                        "example": 8
+                    }
 
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Utworzono 4 grup o liczności 4-5 robotów, z każdej których wyłoni się 1 finalistów."
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "UZYTKOWNIKCY.uzytkownik_uuid is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
 
 
         "/device/confirmSendMessage": {
@@ -7290,68 +7534,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka wiadomość nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka wiadomość nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "WIADOMOSC.wiadomosc_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "WIADOMOSC.wiadomosc_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -7400,68 +7644,68 @@
                                     }
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka wiadomość nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka wiadomość nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "WIADOMOSC.wiadomosc_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "WIADOMOSC.wiadomosc_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
@@ -7498,68 +7742,68 @@
                                     "example": null
                                 }
                             }
-                        },
-                        "400": {
-                            "description": "Błędnie określone dane",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "Taka wiadomość nie istnieje!"
-                                    }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taka wiadomość nie istnieje!"
                                 }
                             }
-                        },
-                        "401": {
-                            "description": "Dostęp nieautoryzowany",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Bad Request"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "You have not permission to get the data"
-                                    }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
                                 }
                             }
-                        },
-                        "406": {
-                            "description": "Podane dane nie są właściwe",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Not Acceptable"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": "WIADOMOSC.wiadomosc_id is not valid"
-                                    }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "WIADOMOSC.wiadomosc_id is not valid"
                                 }
                             }
-                        },
-                        "500": {
-                            "description": "Błąd serwera",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "message": {
-                                        "type": "string",
-                                        "example": "ERROR: Internal Server Error"
-                                    },
-                                    "body": {
-                                        "type": "string",
-                                        "example": null
-                                    }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
                                 }
                             }
                         }
