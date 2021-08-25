@@ -228,7 +228,7 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
     });
 });
 
-const registerEmailTemplatePath = 'src/views/email/register.hbs';
+const registerEmailTemplatePath = process.env.EMAIL_VIEWS_PATH + 'register.hbs';
 var registerEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePath), 'utf8'));
 
 router.post('/registerUser', (req, res, next) => {
@@ -264,20 +264,30 @@ router.post('/registerUser', (req, res, next) => {
                 html: registerEmailTemplate(locals) 
             };
           };
-        const result = await Nodemailer.default.getTransporter().sendMail(
-            options(email, {
-                LINK: "https://alexanderpaterson.com/posts/use-handlebars-to-send-great-emails-from-node-applications"
-            })
-        );
+
+        const kod = results[0][0].kod;
 
         const nowyUzytkownik = {
-            uzytkownik_id: results[1][0].uzytkownik_id,
-            uzytkownik_uuid: results[1][0].uzytkownik_uuid,
-            imie: imie,
-            nazwisko: nazwisko,
-            email: email
-        };
-        
+              uzytkownik_id: results[1][0].uzytkownik_id,
+              uzytkownik_uuid: results[1][0].uzytkownik_uuid,
+              imie: imie,
+              nazwisko: nazwisko,
+              email: email
+          };
+          
+        let blad = false;
+        const result = await Nodemailer.default.getTransporter().sendMail(
+            options(email, {
+                LINK: `${process.env.CONFIRM_EMAIL_LINK}/${nowyUzytkownik.uzytkownik_uuid}/${kod}/0`
+            })
+        ).catch((err) => {
+            blad = true;
+            ClientError.expectationFailed(res, "Nie można wysłać maila na ten adres!")
+            return;
+        });
+
+        if(blad) return;
+
         Success.OK(res, nowyUzytkownik);
     });
 });

@@ -15,6 +15,8 @@ declare global {
             EMAIL_USER: string;
             EMAIL_USER_PASS: string;
             EMAIL_HOST: string;
+            EMAIL_VIEWS_PATH: string;
+            CONFIRM_EMAIL_LINK: string;
         }
     }
 }
