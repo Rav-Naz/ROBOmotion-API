@@ -447,11 +447,11 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
     }
 
     //sprawdzenie czy ilosc do finalu, ilosc stanowisk 2^n
-    if (iloscDoFinalu !== 2 && iloscDoFinalu !== 4 && iloscDoFinalu !== 8 && iloscDoFinalu !== 16 && iloscDoFinalu !== 32 && iloscDoFinalu !== 64 && iloscDoFinalu !== 128) {
+    if (iloscDoFinalu !== 1 && iloscDoFinalu !== 2 && iloscDoFinalu !== 4 && iloscDoFinalu !== 8 && iloscDoFinalu !== 16 && iloscDoFinalu !== 32 && iloscDoFinalu !== 64 && iloscDoFinalu !== 128) {
         ClientError.badRequest(res, 'Ilość do finału nie jest równa 2^n')
         return;
     }
-    if (stanowiskaLista.length !== 2 && stanowiskaLista.length !== 4 && stanowiskaLista.length !== 8 && stanowiskaLista.length !== 16 && stanowiskaLista.length !== 32 && stanowiskaLista.length !== 64 && stanowiskaLista.length !== 128) {
+    if (stanowiskaLista.length !== 1 && stanowiskaLista.length !== 2 && stanowiskaLista.length !== 4 && stanowiskaLista.length !== 8 && stanowiskaLista.length !== 16 && stanowiskaLista.length !== 32 && stanowiskaLista.length !== 64 && stanowiskaLista.length !== 128) {
         ClientError.badRequest(res, 'Ilość stanowisk nie jest równa 2^n')
         return;
     }
@@ -473,56 +473,57 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
 
     //DRZEWKO FINAŁU
     //utwórz grupe finałową
-
-    const grupaFinalowaId = (await GRUPY_WALK_dodajGrupe(res, `FINAŁ - ${kategoria_nazwa}`, kategoria_id) as any).grupa_id;
-    //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
-    const iloscWalk = iloscDoFinalu / 2;
-    const maxDeep = Math.log2(iloscWalk) - 1;
+    if (iloscDoFinalu !== 1) {
+        const grupaFinalowaId = (await GRUPY_WALK_dodajGrupe(res, `FINAŁ - ${kategoria_nazwa}`, kategoria_id) as any).grupa_id;
+        //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
+        const iloscWalk = iloscDoFinalu / 2;
+        const maxDeep = Math.log2(iloscWalk) - 1;
+        
+        //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
+        let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
     
-    //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
-    let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
-
-    if (stanowiska.length < iloscWalk) {
-        for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
-            stanowiska = stanowiska.concat(stanowiska);
-        }
-    }
-    const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
-    const initial_length = iloscWalk * 2 - 1;
-    let do_wybrania = new Array(initial_length).fill(0);
-    let actual_length = initial_length;
-    let offset = 0;
-    for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
-        let pula = [...stanowiska];
-        if (i == maxDeepStanowiska + 1) {
-            while (do_wybrania.findIndex(b => b === 0) > 0) {
-                do_wybrania[do_wybrania.findIndex(b => b === 0)] = pula.pop();
+        if (stanowiska.length < iloscWalk) {
+            for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
+                stanowiska = stanowiska.concat(stanowiska);
             }
-        } else {
-            let o = offset;
-            for (let j = 0; j < Math.pow(2, i); j++) {
-                if (j % 2 === 0) {
-                    o += j / 2
+        }
+        const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
+        const initial_length = iloscWalk * 2 - 1;
+        let do_wybrania = new Array(initial_length).fill(0);
+        let actual_length = initial_length;
+        let offset = 0;
+        for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
+            let pula = [...stanowiska];
+            if (i == maxDeepStanowiska + 1) {
+                while (do_wybrania.findIndex(b => b === 0) > 0) {
+                    do_wybrania[do_wybrania.findIndex(b => b === 0)] = pula.pop();
                 }
-                let s = j * actual_length
-                do_wybrania[o + s] = pula.pop();
+            } else {
+                let o = offset;
+                for (let j = 0; j < Math.pow(2, i); j++) {
+                    if (j % 2 === 0) {
+                        o += j / 2
+                    }
+                    let s = j * actual_length
+                    do_wybrania[o + s] = pula.pop();
+                }
+                actual_length = (actual_length - 1) / 2;
+                offset += 1;
             }
-            actual_length = (actual_length - 1) / 2;
-            offset += 1;
         }
-    }
-
-    do_wybrania = do_wybrania.reverse();
-
-    let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
-    let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
-
-    while (stosWalk.length !== 0) {
-        let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
-        let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
-        if (nadrzednaWalka.poziom < maxDeep) {
-            stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
-            stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+    
+        do_wybrania = do_wybrania.reverse();
+    
+        let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
+        let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
+    
+        while (stosWalk.length !== 0) {
+            let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
+            let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
+            if (nadrzednaWalka.poziom < maxDeep) {
+                stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+                stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+            }
         }
     }
 

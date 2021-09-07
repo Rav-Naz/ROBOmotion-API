@@ -178,7 +178,7 @@ export class ClientError {
     }
 
     static tooManyRequests(res: express.Response, body?: object | string) {
-        res.status(428).send({
+        res.status(429).send({
             message: "ERROR: Too Many Requests",
             body: body !== undefined ? body : null
         })
@@ -199,14 +199,14 @@ export class ClientError {
     }
 
     static unavailableForLegalReasons(res: express.Response, body?: object | string) {
-        res.status(444).send({
+        res.status(451).send({
             message: "ERROR: Unavailable For Legal Reasons",
             body: body !== undefined ? body : null
         })
     }
 
     static clientClosedRequest(res: express.Response, body?: object | string) {
-        res.status(444).send({
+        res.status(499).send({
             message: "ERROR: Client Closed Request",
             body: body !== undefined ? body : null
         })
