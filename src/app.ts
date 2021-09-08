@@ -19,6 +19,7 @@ import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
 import * as Nodemailer from './utils/nodemailer'
+import cors from 'cors';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -45,6 +46,8 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }))
 
 app.use(morgan('short'));
+
+app.use(cors());
 
 app.use((req, res, next) => { //CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
