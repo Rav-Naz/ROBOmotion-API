@@ -41,7 +41,8 @@ function GRUPY_WALK_dodajGrupe(res: express.Response, nazwa: string, kategoria_i
             }
             const grupa = {
                 grupa_id: results[1][0].grupa_id,
-                nazwa: nazwa
+                nazwa: nazwa,
+                kategoria_id: kategoria_id
             };
             socketIO.default.getIO().emit("addGroup", grupa);
             resolve(grupa);
@@ -109,7 +110,7 @@ function WALKI_dodajWalkeOrazRoboty(res: express.Response, stanowisko_id: number
             }
         
             const walka = results[results.length - 2][0];
-            socketIO.default.getIO().emit("addRobotToFight", walka);
+            socketIO.default.getIO().emit("addFightAndRobots", walka);
             resolve(walka);
         });
     });
@@ -182,7 +183,7 @@ router.put('/confirmArrival', (req, res, next) => {
             return;
         }
         const robot = results[0][0];
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("newArrival", robot);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/newArrival", robot);
         Success.OK(res, robot);
     });
 });

@@ -3286,7 +3286,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/addRobotCategory)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -3420,7 +3420,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/deleteRobotCategory)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -3554,7 +3554,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/addConstructor)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -3680,7 +3680,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/deleteConstructor)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -3913,7 +3913,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/addRobot)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -4061,7 +4061,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/updateRobot)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -4304,7 +4304,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/deleteRobot)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -4425,7 +4425,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: users/addUserPhoneNumber)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -4690,7 +4690,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: users/editUser)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -4801,7 +4801,7 @@
                 }],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: users/deleteUser)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -5560,7 +5560,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/setFightResult , setFightResult)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -5844,7 +5844,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/setTimeResult , setTimeResult)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -5978,7 +5978,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/updateTimeResult , updateTimeResult)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6118,7 +6118,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: addGroup)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6236,7 +6236,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: deleteGroup)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6354,7 +6354,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: robots/newArrival)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6498,7 +6498,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: addFight)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6667,7 +6667,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: addFightAndRobots)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -6850,7 +6850,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: addRobotToFight)",
                         "schema": {
                             "type": "object",
                             "properties": {
@@ -7024,7 +7024,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: removeFight)",
                         "schema": {
                             "type": "object",
                             "properties": {

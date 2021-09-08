@@ -14,7 +14,7 @@ export default {
     
         const signedToken = JWT.sign(payload, secret.toString(), {
             algorithm: 'HS256',
-            expiresIn: '1d'
+            expiresIn: '7d'
         });
     
         return signedToken;

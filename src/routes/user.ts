@@ -131,8 +131,8 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
             kategoria_id: kategoria_id,
             isSucces: results[0][0].pIsSucces
         };
-        console.log(kategoria_robota)
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("addRobotCategory", kategoria_robota);
+
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/addRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -176,7 +176,7 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("deleteRobotCategory", kategoria_robota);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/deleteRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -218,7 +218,7 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
             konstruktor_id: results[0][0].konstruktor_id
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("addConstructor", utworzony_konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
         Success.OK(res, utworzony_konstruktor);
     });
 });
@@ -260,7 +260,7 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("deleteConstructor", konstruktor);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
         Success.OK(res, konstruktor);
     });
 });
@@ -318,7 +318,7 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
         const konstruktor = {
             konstruktor_id: results[1][0].konstruktor_id
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("newRobot", {robot, konstruktor});
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("robots/addRobot", {robot, konstruktor});
         Success.OK(res, {robot, konstruktor});
     });
 });
@@ -360,7 +360,7 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
             nazwa: nazwa,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("updateRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/updateRobot", robot);
         Success.OK(res, robot);
     });
 });
@@ -416,7 +416,7 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
             robot_uuid: robot_uuid,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("deleteRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteRobot", robot);
         Success.OK(res, robot);
     });
 });
@@ -449,7 +449,7 @@ router.post('/addUserPhoneNumber', access.default.canModify, async (req, res, ne
             numer_telefonu: numer_telefonu,
             isSucces: results[2][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("addUserPhoneNumber", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/addUserPhoneNumber", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });
@@ -484,7 +484,7 @@ router.put('/editUser', access.default.canModify, async (req, res, next) => {
             nazwisko: nazwisko,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("editUser", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/editUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });
@@ -525,7 +525,7 @@ router.delete('/deleteUser', access.default.canModify,  async (req, res, next) =
             isSucces: results[0][0].pIsSucces
         };
         
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("deleteUser", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/deleteUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });
