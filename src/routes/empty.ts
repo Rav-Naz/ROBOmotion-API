@@ -5,19 +5,19 @@ const router = express.Router();
 
 
 router.get('*', (req, res, next) => {
-    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
+    ClientError.misdirectedRequest(res,"Cannot reach the path");
 })
 router.post('*', (req, res, next) => {
-    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
+    ClientError.misdirectedRequest(res, "Cannot reach the path");
 })
 router.delete('*', (req, res, next) => {
-    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
+    ClientError.misdirectedRequest(res, "Cannot reach the path");
 })
 router.patch('*', (req, res, next) => {
-    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
+    ClientError.misdirectedRequest(res, "Cannot reach the path");
 })
 router.put('*', (req, res, next) => {
-    ClientError.misdirectedRequest(res, {info: "Cannot reach the path"});
+    ClientError.misdirectedRequest(res, "Cannot reach the path");
 })
 
 export default router;

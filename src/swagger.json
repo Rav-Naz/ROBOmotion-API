@@ -3645,6 +3645,130 @@
                 }
             }
         },
+        "/user/getConstructors/{robot_uuid}": {
+            "get": {
+                "tags": ["Użytkownik"],
+                "summary": "Pobiera konstruktorów robota",
+                "parameters": [{
+                        "name": "token",
+                        "description": "Token uwierzytelniający użytkownika (umieścić w Headers > [token])",
+                        "in": "headers",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 255,
+                        "maximum": 255,
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1enl0a293bmlrX2lkIjoyOCwidXp5dGtvd25pa191dWlkIjoiZWVkMDZhYTgtZmEwMy0xMWViLWJhMGQtYjhjYTNhNWJjN2QwIiwidXp5dGtvd25pa190eXAiOjIsImlhdCI6MTYyODcxNDI0NCwiZXhwIjoxNjI4ODAwNjQ0fQ.Tq2cHnPjtDvwBVEmTxBHPPvrXB5H_6KRBCgJNZqUzps"
+                    },
+                    {
+                        "name": "robot_uuid",
+                        "description": "Identyfikator robota",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 36,
+                        "maximum": 36,
+                        "example": "c75af0de-f846-11eb-ba0d-b8ca3a5bc7d0"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "uzytkownik_uuid": {
+                                                "type": "string",
+                                                "example": "ad2cabe5-1015-11ec-87bf-b8ca3a5bc7d0"
+                                            },
+                                            "imie": {
+                                                "type": "string",
+                                                "example": "Rafał Nazarko"
+                                            },
+                                            "nazwisko": {
+                                                "type": "string",
+                                                "example": "asd"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki robot nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "ROBOTY.robot_uuid is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/deleteConstructor": {
             "delete": {
                 "tags": ["Użytkownik"],

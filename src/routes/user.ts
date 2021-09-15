@@ -223,6 +223,42 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
     });
 });
 
+router.get('/getConstructors/:robot_uuid', access.default.canModify, async (req, res, next) => {
+
+    const body = req.body;
+    const robot_uuid = req.params?.robot_uuid;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        ROBOTY.validator({robot_uuid: robot_uuid});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
+        if((czyJest as any).pCzyJest == 0) {
+            ClientError.unauthorized(res, "User is not constructor of a robot");
+            return;
+        }
+    }
+
+    db.query("CALL `ROBOTY_pobierzKonstruktorowRobota(U)`(?);", [robot_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        const konstruktorzy = results[0];
+
+        Success.OK(res, konstruktorzy);
+    });
+});
+
 router.delete('/deleteConstructor', access.default.canModify, async (req, res, next) => {
 
     const body = req.body;
