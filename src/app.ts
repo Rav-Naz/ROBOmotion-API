@@ -5,6 +5,11 @@ import morgan from 'morgan';
 import swaggerUI from 'swagger-ui-express';
 import * as swaggerDoc from './swagger.json'; 
 import * as http from 'http';
+import * as https from 'https';
+import cors from 'cors';
+import * as fs from 'fs';
+import * as path from 'path';
+
 dotenv.config();
 
 import publicRoutes from './routes/public';
@@ -19,10 +24,14 @@ import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
 import * as Nodemailer from './utils/nodemailer'
-import cors from 'cors';
 
+// console.log()
+var privateKey  = fs.readFileSync(path.join(__dirname, 'certs/key.pem'), 'utf8');
+var certificate = fs.readFileSync(path.join(__dirname, 'certs/cert.pem'), 'utf8');
+var credentials = {key: privateKey, cert: certificate};
 const app = express();
 const httpServer = http.createServer(app);
+const httpsServer = https.createServer(credentials, app);
 const options = {
     cors: {
         origin: "http://localhost:4200",
@@ -30,7 +39,7 @@ const options = {
     }
  };
 
-const io = socketIO.default.init(httpServer, options);
+const io = socketIO.default.init(httpsServer, options);
 const nodemailer = Nodemailer.default.init();
 
 app.set('views', __dirname + '/views');
@@ -66,3 +75,4 @@ app.use('/device', auth.default.authorize(3), deviceRoutes);
 app.use(emptyRoutes); //When can't resolve the path
 
 const server = httpServer.listen(port);
+const serverHttps = httpsServer.listen(8443);
