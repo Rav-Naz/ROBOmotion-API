@@ -3695,6 +3695,10 @@
                                             "nazwisko": {
                                                 "type": "string",
                                                 "example": "asd"
+                                            },
+                                            "konstruktor_id": {
+                                                "type": "number",
+                                                "example": "25"
                                             }
                                         }
                                     }

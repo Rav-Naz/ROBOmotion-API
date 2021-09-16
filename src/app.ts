@@ -25,13 +25,9 @@ import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
 import * as Nodemailer from './utils/nodemailer'
 
-// console.log()
-var privateKey  = fs.readFileSync(path.join(__dirname, 'certs/key.pem'), 'utf8');
-var certificate = fs.readFileSync(path.join(__dirname, 'certs/cert.pem'), 'utf8');
-var credentials = {key: privateKey, cert: certificate};
+const hostName = '127.0.0.1';
 const app = express();
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(credentials, app);
 const options = {
     cors: {
         origin: "http://localhost:4200",
@@ -39,13 +35,13 @@ const options = {
     }
  };
 
-const io = socketIO.default.init(httpsServer, options);
+const io = socketIO.default.init(httpServer, options);
 const nodemailer = Nodemailer.default.init();
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-const port = process.env.SERVER_PORT || 8080;
+const port = Number(process.env.SERVER_PORT) || 8080;
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
   
@@ -74,5 +70,6 @@ app.use('/device', auth.default.authorize(3), deviceRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 
-const server = httpServer.listen(port);
-const serverHttps = httpsServer.listen(8443);
+const server = httpServer.listen(port, hostName , () => {
+    console.log(`Server running at http://${hostName}:${port}`);
+});
