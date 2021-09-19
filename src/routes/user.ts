@@ -215,15 +215,16 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
 
         const utworzony_konstruktor = {
             uzytkownik_uuid: nowy_uzytkownik_uuid,
-            konstruktor_id: results[0][0].konstruktor_id
+            konstruktor_id: results[0][0].konstruktor_id,
+            robot_uuid: robot_uuid
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
+        socketIO.default.getIO().to(`users/${nowy_uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
         Success.OK(res, utworzony_konstruktor);
     });
 });
 
-router.get('/getConstructors/:robot_uuid', access.default.canModify, async (req, res, next) => {
+router.get('/getConstructors/:robot_uuid', async (req, res, next) => {
 
     const body = req.body;
     const robot_uuid = req.params?.robot_uuid;
@@ -291,12 +292,13 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
         }
 
         const konstruktor = {
-            uzytkownik_uuid: uzytkownik_uuid,
+            uzytkownik_uuid: results[0][0].uzytkownik_uuid,
             konstruktor_id: konstruktor_id,
+            robot_uuid: robot_uuid,
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
+        socketIO.default.getIO().to(`users/${konstruktor.uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
         Success.OK(res, konstruktor);
     });
 });
@@ -537,8 +539,8 @@ router.get('/getUser', async (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-
-        Success.OK(res, results[0][0]);
+        let result = results[0][0]
+        Success.OK(res, {...result, token: req.query.JWT});
     });
 });
 

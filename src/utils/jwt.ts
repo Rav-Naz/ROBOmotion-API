@@ -27,6 +27,7 @@ export default {
                 ClientError.unauthorized(res, "You have not permission to get the data");
                 return;
             }
+            req.query.JWT = token;
             JWT.verify(token, secret, { ignoreExpiration: false }, function(err, decoded) {
                 if (err) {
                     blad = true;

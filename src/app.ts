@@ -5,10 +5,7 @@ import morgan from 'morgan';
 import swaggerUI from 'swagger-ui-express';
 import * as swaggerDoc from './swagger.json'; 
 import * as http from 'http';
-import * as https from 'https';
 import cors from 'cors';
-import * as fs from 'fs';
-import * as path from 'path';
 
 dotenv.config();
 
@@ -53,13 +50,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(morgan('short'));
 
 app.use(cors());
-
-app.use((req, res, next) => { //CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-});
 
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
