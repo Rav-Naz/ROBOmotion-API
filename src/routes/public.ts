@@ -229,7 +229,9 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
 });
 
 const registerEmailTemplatePath = process.env.EMAIL_VIEWS_PATH + 'register.hbs';
+const registerEmailTemplatePathEng = process.env.EMAIL_VIEWS_PATH + 'registereng.hbs';
 var registerEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePath), 'utf8'));
+var registerEmailTemplateEng = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePathEng), 'utf8'));
 
 router.post('/registerUser', (req, res, next) => {
     const body = req.body;
@@ -237,6 +239,7 @@ router.post('/registerUser', (req, res, next) => {
     const nazwisko = body?.nazwisko;
     const email = body?.email;
     const haslo = body?.haslo;
+    const lang = body?.lang ? body?.lang : 'en';
     try {
         UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo});
     } catch (err) {
@@ -260,8 +263,8 @@ router.post('/registerUser', (req, res, next) => {
             return {
                 from: `ROBO~motion <${process.env.EMAIL_FROM_ADDR}>`,
                 to: email,
-                subject: 'Aktywacja konta',
-                html: registerEmailTemplate(locals) 
+                subject: lang === 'en' ? 'Account activation' : 'Aktywacja konta',
+                html: lang === 'en' ? registerEmailTemplateEng(locals) : registerEmailTemplate(locals) 
             };
           };
 
@@ -289,6 +292,93 @@ router.post('/registerUser', (req, res, next) => {
         if(blad) return;
 
         Success.OK(res, nowyUzytkownik);
+    });
+});
+
+const resetPasswordEmailTemplatePath = process.env.EMAIL_VIEWS_PATH + 'resetpassword.hbs';
+const resetPasswordEmailTemplatePathEng = process.env.EMAIL_VIEWS_PATH + 'resetpasswordeng.hbs';
+var resetPasswordEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(resetPasswordEmailTemplatePath), 'utf8'));
+var resetPasswordEmailTemplateEng = Handlebars.compile(fs.readFileSync(path.resolve(resetPasswordEmailTemplatePathEng), 'utf8'));
+
+router.post('/remind', (req, res, next) => {
+    const body = req.body;
+    const email = body?.email;
+    console.log(body?.lang)
+    const lang = body?.lang ? body?.lang : 'en';
+    try {
+        UZYTKOWNICY.validator({email: email});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+
+    db.query("CALL `UZYTKOWNICY_zapomnialemHaslo(*)`(?);", [email], async (err, results, fields) => {
+
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+    
+        var options = (email: string, locals?: object) => {
+            return {
+                from: `ROBO~motion <${process.env.EMAIL_FROM_ADDR}>`,
+                to: email,
+                subject: lang === 'en' ? 'Have you forgotten your password?' : 'Zapomniałeś hasła?',
+                html: lang === 'en' ? resetPasswordEmailTemplateEng(locals) : resetPasswordEmailTemplate(locals) 
+            };
+          };
+
+        const kod = results[0][0].kod;
+        const uzytkownik_uuid = results[1][0].uzytkownik_uuid;
+          
+        let blad = false;
+        const result = await Nodemailer.default.getTransporter().sendMail(
+            options(email, {
+                LINK: `${process.env.RESET_PASSWORD_LINK}/${uzytkownik_uuid}/${kod}`
+            })
+        ).catch((err) => {
+            blad = true;
+            ClientError.expectationFailed(res, "Nie można wysłać maila na ten adres!")
+            return;
+        });
+
+        if(blad) return;
+
+        Success.OK(res, {pIsSucces: 1});
+    });
+});
+
+router.post('/reset-password', (req, res, next) => {
+    const body = req.body;
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+    const kod = Number(body?.kod);
+    const haslo = body?.haslo;
+    try {
+        POTWIERDZENIA.validator({kod: kod})
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, haslo: haslo});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+    
+    
+    console.log(`uzytkownik_uuid: '${uzytkownik_uuid}'`)
+    db.query("CALL `UZYTKOWNICY_nadajNoweHaslo(*)`(?,?,?);", [uzytkownik_uuid,kod,auth.hashPassword(haslo).toString()], async (err, results, fields) => {
+        
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, {pIsSucces: 1});
     });
 });
 

@@ -3,15 +3,15 @@
     "info": {
         "version": "1.0.0",
         "title": "API na zawody ROBO~motion",
-        "description": "Pełny system sieciowy do zarządzania zadodami ROBO~motion",
+        "description": "Pełny system sieciowy do zarządzania zawodami ROBO~motion",
         "license": {
             "name": "MIT",
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:8080",
+    "host": "http://127.0.0.1:8080",
     "basePath": "",
-    "schemes": ["http", "https"],
+    "schemes": ["http"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "tags": [{
@@ -1250,6 +1250,197 @@
                                 "body": {
                                     "type": "string",
                                     "example": "UZYTKOWNICY.imie is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/public/remind": {
+            "post": {
+                "tags": ["Publiczne"],
+                "summary": "Wysyła prośbę o zresetowanie hasła",
+                "parameters": [{
+                    "name": "email",
+                    "description": "Email na który przyjdzie potwierdzenie (jest on równocześnie loginem użytkownika)",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 2,
+                    "maximum": 100,
+                    "example": "kontakt@kneiti.prz.edu.pl"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "object",
+                                    "properties": {
+                                        "isSuccess": {
+                                            "type": "number",
+                                            "example": "1"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "UZYTKOWNICY.email is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/public/reset-password": {
+            "post": {
+                "tags": ["Publiczne"],
+                "summary": "Ustawia nowe hasło dla użytkownika",
+                "parameters": [{
+                        "name": "uzytkownik_uuid",
+                        "description": "Identyfikator użytkownika",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 36,
+                        "maximum": 36,
+                        "example": "c75af0de-f846-11eb-ba0d-b8ca3a5bc7d0"
+                    },
+                    {
+                        "name": "kod",
+                        "description": "Kod potwierdzający z maila",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 6,
+                        "maximum": 6,
+                        "example": "981723"
+                    },
+                    {
+                        "name": "haslo",
+                        "description": "Nowe hasło",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 6,
+                        "maximum": 64,
+                        "example": "qwerty123"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "object",
+                                    "properties": {
+                                        "isSuccess": {
+                                            "type": "number",
+                                            "example": "1"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "UZYTKOWNICY.email is not valid"
                                 }
                             }
                         }
