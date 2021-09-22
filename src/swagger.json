@@ -1916,7 +1916,6 @@
                                             },
                                             "nastepna_walka_id": {
                                                 "type": "number",
-                                                "example": null,
                                                 "example": null
                                             },
                                             "grupa_id": {
@@ -2051,7 +2050,6 @@
                                             },
                                             "nastepna_walka_id": {
                                                 "type": "number",
-                                                "example": null,
                                                 "example": null
                                             },
                                             "grupa_id": {
@@ -2202,7 +2200,6 @@
                                             },
                                             "nastepna_walka_id": {
                                                 "type": "number",
-                                                "example": null,
                                                 "example": null
                                             },
                                             "grupa_id": {
@@ -2476,7 +2473,6 @@
                                             },
                                             "nastepna_walka_id": {
                                                 "type": "number",
-                                                "example": null,
                                                 "example": null
                                             },
                                             "grupa_id": {
@@ -4975,7 +4971,7 @@
             }
         },
         "/user/editUser": {
-            "post": {
+            "put": {
                 "tags": ["Użytkownik"],
                 "summary": "Aktualizuje dane użytkownika",
                 "parameters": [{

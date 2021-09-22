@@ -455,11 +455,12 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
             isSucces: results[0][0].pIsSucces
         };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteRobot", robot);
+        // socketIO.default.getIO().in(`robots/${robot_uuid}`).c
         Success.OK(res, robot);
     });
 });
 
-router.post('/addUserPhoneNumber', access.default.canModify, async (req, res, next) => {
+router.post('/addUserPhoneNumber', async (req, res, next) => {
 
     const body = req.body;
     const numer_telefonu = body?.numer_telefonu;
