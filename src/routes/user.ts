@@ -219,7 +219,7 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
             robot_uuid: robot_uuid
         };
 
-        socketIO.default.getIO().to(`users/${nowy_uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${nowy_uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
         Success.OK(res, utworzony_konstruktor);
     });
 });
