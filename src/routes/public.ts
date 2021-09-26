@@ -303,7 +303,6 @@ var resetPasswordEmailTemplateEng = Handlebars.compile(fs.readFileSync(path.reso
 router.post('/remind', (req, res, next) => {
     const body = req.body;
     const email = body?.email;
-    console.log(body?.lang)
     const lang = body?.lang ? body?.lang : 'en';
     try {
         UZYTKOWNICY.validator({email: email});
@@ -366,8 +365,6 @@ router.post('/reset-password', (req, res, next) => {
         return;
     }
     
-    
-    console.log(`uzytkownik_uuid: '${uzytkownik_uuid}'`)
     db.query("CALL `UZYTKOWNICY_nadajNoweHaslo(*)`(?,?,?);", [uzytkownik_uuid,kod,auth.hashPassword(haslo).toString()], async (err, results, fields) => {
         
         if (err?.sqlState === '45000') {

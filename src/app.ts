@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import morgan from 'morgan';
 import swaggerUI from 'swagger-ui-express';
-import * as swaggerDoc from './swagger.json'; 
+import * as swaggerDoc from './swagger.json';
 import * as http from 'http';
 import cors from 'cors';
 
@@ -25,14 +25,15 @@ import * as Nodemailer from './utils/nodemailer'
 const hostName = '127.0.0.1';
 const app = express();
 const httpServer = http.createServer(app);
-const options = {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
-    }
- };
+const corsOptions = {
+    origin: ['https://test.robomotion.com.pl/', 'https://robomotion.com.pl/', 'http://localhost:4200'],
+    optionsSuccessStatus: 200,
+    methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT'],
+    allowedHeaders: ['Content-Type', 'x-requested-with', 'Authorization', 'Accept', 'token'],
+    maxAge: 86400
+};
 
-const io = socketIO.default.init(httpServer, options);
+const io = socketIO.default.init(httpServer, { cors: corsOptions });
 const nodemailer = Nodemailer.default.init();
 
 app.set('views', __dirname + '/views');
@@ -41,7 +42,7 @@ app.set('view engine', 'ejs');
 const port = Number(process.env.SERVER_PORT) || 8080;
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
-  
+
 app.use(apiRatelimit); //DDOS prtection
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -49,17 +50,17 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(morgan('short'));
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
-app.use('/user',JWT.default.verify, auth.default.authorize(0), userRoutes);
-app.use('/referee',JWT.default.verify, auth.default.authorize(1), refereeRoutes);
-app.use('/admin',JWT.default.verify, auth.default.authorize(2), adminRoutes);
+app.use('/user', JWT.default.verify, auth.default.authorize(0), userRoutes);
+app.use('/referee', JWT.default.verify, auth.default.authorize(1), refereeRoutes);
+app.use('/admin', JWT.default.verify, auth.default.authorize(2), adminRoutes);
 app.use('/device', auth.default.authorize(3), deviceRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 
-const server = httpServer.listen(port, hostName , () => {
+const server = httpServer.listen(port, hostName, () => {
     console.log(`Server running at http://${hostName}:${port}`);
 });
