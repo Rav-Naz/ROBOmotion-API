@@ -27,7 +27,7 @@ const app = express();
 const httpServer = http.createServer(app);
 const options = {
     cors: {
-        origin: "http://localhost:4200",
+        origin: "*",
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
     }
  };

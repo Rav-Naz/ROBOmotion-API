@@ -132,7 +132,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/addRobotCategory", kategoria_robota);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -176,7 +176,7 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/deleteRobotCategory", kategoria_robota);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -298,7 +298,7 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`users/${konstruktor.uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${konstruktor.uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
         Success.OK(res, konstruktor);
     });
 });
