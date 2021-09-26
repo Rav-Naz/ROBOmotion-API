@@ -26,7 +26,7 @@ const hostName = '127.0.0.1';
 const app = express();
 const httpServer = http.createServer(app);
 const corsOptions = {
-    origin: ['https://test.robomotion.com.pl/', 'https://robomotion.com.pl/', 'http://localhost:4200'],
+    origin: ['https://test.robomotion.com.pl', 'https://robomotion.com.pl', 'http://localhost:4200'],
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT'],
     allowedHeaders: ['Content-Type', 'x-requested-with', 'Authorization', 'Accept', 'token'],
