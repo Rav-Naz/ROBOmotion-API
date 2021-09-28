@@ -13,7 +13,8 @@ router.get('/info', (req, res, next) => {
     Success.OK(res, {
         eventDate: eventDate,
         streamLink: streamLink,
-        accessToModifyExpirationDate: access.default.getExpirationDate()
+        accessToModifyExpirationDate: access.default.getExpirationDate(),
+        accessToSmashRobots: access.default.getSmashRobotsExpirationDate()
     })
 })
 

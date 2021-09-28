@@ -105,6 +105,11 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
         return;
     }
 
+    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
+        ClientError.locked(res, "Time to add Smash Robots category has ended!");
+        return;
+    }
+
     if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
         const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
         if((czyJest as any).pCzyJest == 0) {
