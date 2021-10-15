@@ -11,6 +11,7 @@ import { ServerError } from '../responses/server_errors';
 import { Success } from '../responses/success';
 import db from '../utils/database';
 import * as socketIO from '../utils/socket';
+import { KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora } from './user';
 
 const router = express.Router();
 
@@ -130,6 +131,33 @@ router.get('/getUserContactDetails/:uzytkownik_uuid', (req, res, next) => {
         }
 
         Success.OK(res, results[0][0]);
+    });
+});
+
+router.get('/getRobotsOfUserInCategory/:uzytkownik_uuid/:kategoria_id', (req, res, next) => {
+
+    const uzytkownik_uuid = req.params?.uzytkownik_uuid;
+    const kategoria_id = Number(req.params?.kategoria_id);
+    
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        KATEGORIE.validator({kategoria_id: kategoria_id});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktoraWKategorii(S)`(?,?);",  [uzytkownik_uuid, kategoria_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        const roboty = results[0];
+        Success.OK(res, roboty);
     });
 });
 
