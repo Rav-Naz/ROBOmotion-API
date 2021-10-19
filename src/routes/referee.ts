@@ -11,7 +11,6 @@ import { ServerError } from '../responses/server_errors';
 import { Success } from '../responses/success';
 import db from '../utils/database';
 import * as socketIO from '../utils/socket';
-import { KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora } from './user';
 
 const router = express.Router();
 
@@ -134,6 +133,31 @@ router.get('/getUserContactDetails/:uzytkownik_uuid', (req, res, next) => {
     });
 });
 
+router.get('/getUsers', (req, res, next) => {
+
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_pobierzUzytkownikow(S)`(?);",  [uzytkownik_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        const uzytkownicy = results[0];
+        Success.OK(res, uzytkownicy);
+    });
+});
+
 router.get('/getRobotsOfUserInCategory/:uzytkownik_uuid/:kategoria_id', (req, res, next) => {
 
     const uzytkownik_uuid = req.params?.uzytkownik_uuid;
@@ -189,6 +213,8 @@ router.post('/setFightResult', (req, res, next) => {
             walka_id: walka_id,
             robot1_uuid: results[0][0].robot1_uuid,
             robot2_uuid: results[0][0].robot2_uuid,
+            stanowisko_id: results[0][0].stanowisko_id,
+            czas_zakonczenia: new Date().toISOString(),
             wygrane_rundy_robot1: wygrane_rundy_robot1,
             wygrane_rundy_robot2: wygrane_rundy_robot2,
             isSucces: results[0][0].pIsSucces,
@@ -256,6 +282,9 @@ router.post('/setTimeResult', (req, res, next) => {
         const wynik = {
             wynik_id: results[3][0].wynik_id,
             robot_id: results[3][0].robot_id,
+            nazwa_robota: results[3][0].nazwa_robota,
+            nazwa_kategorii: results[3][0].nazwa_kategorii,
+            czas_zakonczenia: new Date().toISOString(),
             robot_uuid: robot_uuid,
             czas_przejazdu: czas_przejazdu,
             stanowisko_id: stanowisko_id,
