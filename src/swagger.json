@@ -5831,6 +5831,140 @@
                 }
             }
         },
+        "/referee/getUsers": {
+            "get": {
+                "tags": ["Sędzia"],
+                "summary": "Zwraca użytkowników przypisanych do danego stanowiska",
+                "parameters": [{
+                    "name": "token",
+                    "description": "Token uwierzytelniający użytkownika (umieścić w Headers > [token])",
+                    "in": "headers",
+                    "required": true,
+                    "type": "string",
+                    "minimum": 255,
+                    "maximum": 255,
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1enl0a293bmlrX2lkIjoyOCwidXp5dGtvd25pa191dWlkIjoiZWVkMDZhYTgtZmEwMy0xMWViLWJhMGQtYjhjYTNhNWJjN2QwIiwidXp5dGtvd25pa190eXAiOjIsImlhdCI6MTYyODcxNDI0NCwiZXhwIjoxNjI4ODAwNjQ0fQ.Tq2cHnPjtDvwBVEmTxBHPPvrXB5H_6KRBCgJNZqUzps"
+                }],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "uzytkownik_id": {
+                                    "type": "number",
+                                    "example": "5"
+                                },
+                                "uzytkownik_uuid": {
+                                    "type": "string",
+                                    "example": "77d55e72-22d5-11ec-9083-b8ca3a5bc7d0"
+                                },
+                                "uzytkownik_typ": {
+                                    "type": "number",
+                                    "example": "0"
+                                },
+                                "imie": {
+                                    "type": "string",
+                                    "example": "Andrzej"
+                                },
+                                "nazwisko": {
+                                    "type": "string",
+                                    "example": "Kalinowski"
+                                },
+                                "numer_telefonu": {
+                                    "type": "string",
+                                    "format": "nullable"
+                                },
+                                "email": {
+                                    "type": "string",
+                                    "example": "jekrekk75@gmail.com"
+                                },
+                                "data_rejestracji": {
+                                    "type": "string",
+                                    "example": "2021-10-01T16:34:37.000Z"
+                                },
+                                "stanowiska": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "kategorie": {
+                                    "type": "string",
+                                    "example": "1"
+                                },
+                                "roboty_uuid": {
+                                    "type": "string",
+                                    "example": "9c9c953c-22d5-11ec-9083-b8ca3a5bc7d0"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki użytkownik nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "ROBOTY.nazwa is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/referee/getRobotsOfUserInCategory/{uzytkownik_uuid}/{kategoria_id}": {
             "get": {
                 "tags": ["Sędzia"],

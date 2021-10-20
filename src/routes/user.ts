@@ -242,7 +242,7 @@ router.get('/getConstructors/:robot_uuid', async (req, res, next) => {
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+    if((req.query.JWTdecoded as any).uzytkownik_typ < 1) {
         const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
         if((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
