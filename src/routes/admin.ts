@@ -131,7 +131,13 @@ router.post('/addGroup', (req, res, next) => {
     GRUPY_WALK_dodajGrupe(res, nazwa, kategoria_id).catch(() => {
         return;
     }).then((result) => {
-        Success.OK(res, result as object);
+        const grupa = {
+            grupa_id: (result as any).grupa_id,
+            nazwa: nazwa,
+            kategoria_id: kategoria_id
+        }
+        socketIO.default.getIO().emit("addGroup", grupa);
+        Success.OK(res, grupa);
     });
 });
 
@@ -185,6 +191,32 @@ router.put('/confirmArrival', (req, res, next) => {
         const robot = results[0][0];
         socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/newArrival", robot);
         Success.OK(res, robot);
+    });
+});
+
+router.post('/addPostalCode', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+    const kod_pocztowy = body?.kod_pocztowy;
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy})
+    } catch (err) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_dodajKodPocztowy(A)`(?, ?);", [uzytkownik_uuid, kod_pocztowy], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = results[0][0];
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("user/addPostalCode", response);
+        Success.OK(res, response);
     });
 });
 
@@ -340,8 +372,9 @@ router.delete('/deleteTimeResult', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-
-        Success.OK(res, results[0][0]);
+        const response = results[0][0];
+        socketIO.default.getIO().emit("deleteTimeResult", response);
+        Success.OK(res, response);
     });
 });
 

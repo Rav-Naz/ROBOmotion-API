@@ -40,7 +40,7 @@ export class UZYTKOWNICY{
         if ((typeof body.haslo !== "string" || body.haslo.length > 64 || body.haslo.length < 6) && typeof body.haslo !== "undefined") {
             throw new Error('UZYTKOWNICY.haslo is not valid');
         }
-        if ((typeof body.kod_pocztowy !== "string" || body.kod_pocztowy.length > 6) && typeof body.kod_pocztowy !== "undefined" && typeof body.kod_pocztowy !== "object") {
+        if ((typeof body.kod_pocztowy !== "string" || body.kod_pocztowy.length > 8 || body.kod_pocztowy.length < 2) && typeof body.kod_pocztowy !== "undefined" && typeof body.kod_pocztowy !== "object") {
             throw new Error('UZYTKOWNICY.kod_pocztowy is not valid');
         }
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {

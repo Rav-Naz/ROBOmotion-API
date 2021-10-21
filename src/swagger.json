@@ -6722,6 +6722,10 @@
                                         "nazwa": {
                                             "type": "string",
                                             "example": "Line follower"
+                                        },
+                                        "kategoria_id": {
+                                            "type": "number",
+                                            "example": "1"
                                         }
                                     }
                                 }
@@ -7016,6 +7020,133 @@
                                 "body": {
                                     "type": "string",
                                     "example": "ROBORY.robot_uuid is not valid"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Błąd serwera",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Internal Server Error"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": null
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/addPostalCode": {
+            "post": {
+                "tags": ["Admin"],
+                "summary": "Dodaj kod pocztowy dla przybyłego użytkownika",
+                "parameters": [{
+                        "name": "token",
+                        "description": "Token uwierzytelniający użytkownika (umieścić w Headers > [token])",
+                        "in": "headers",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 255,
+                        "maximum": 255,
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1enl0a293bmlrX2lkIjoyOCwidXp5dGtvd25pa191dWlkIjoiZWVkMDZhYTgtZmEwMy0xMWViLWJhMGQtYjhjYTNhNWJjN2QwIiwidXp5dGtvd25pa190eXAiOjIsImlhdCI6MTYyODcxNDI0NCwiZXhwIjoxNjI4ODAwNjQ0fQ.Tq2cHnPjtDvwBVEmTxBHPPvrXB5H_6KRBCgJNZqUzps"
+                    },
+                    {
+                        "name": "uzytkownik_uuid",
+                        "description": "Identyfikator użytkownika",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 36,
+                        "maximum": 36,
+                        "example": "b38dedd5-f846-11eb-ba0d-b8ca3a5bc7d0"
+                    },
+                    {
+                        "name": "kod_pocztowy",
+                        "description": "Kod pocztowy",
+                        "required": true,
+                        "type": "string",
+                        "minimum": 2,
+                        "maximum": 8,
+                        "example": "35-119"
+                    }
+
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (ws: user/addPostalCode)",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "INFO: OK"
+                                },
+                                "body": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pIsSucces": {
+                                            "type": "number",
+                                            "example": "1"
+                                        },
+                                        "uzytkownik_id": {
+                                            "type": "number",
+                                            "example": "25"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Błędnie określone dane",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "Taki uzytkownik nie istnieje!"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Dostęp nieautoryzowany",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Bad Request"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "You have not permission to get the data"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Podane dane nie są właściwe",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "ERROR: Not Acceptable"
+                                },
+                                "body": {
+                                    "type": "string",
+                                    "example": "ROBORY.uzytkownik is not valid"
                                 }
                             }
                         }
@@ -7873,6 +8004,10 @@
                                         "pIsSucces": {
                                             "type": "number",
                                             "example": "1"
+                                        },
+                                        "wynik_id": {
+                                            "type": "number",
+                                            "example": "11"
                                         }
                                     }
                                 }
