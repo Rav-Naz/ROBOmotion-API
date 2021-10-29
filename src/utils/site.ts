@@ -5,7 +5,7 @@ import * as access from './access';
 
 const router = express.Router();
 
-const eventDate = new Date(2021, 10, 27, 9, 0, 0);
+const eventDate = new Date(2021, 10, 28, 9, 0, 0);
 router.get('/info', (req, res, next) => {
 
     const streamLink = env.WS_STREAMLINK;

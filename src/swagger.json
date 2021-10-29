@@ -7990,7 +7990,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "OK (ws: deleteTimeResult)",
                         "schema": {
                             "type": "object",
                             "properties": {

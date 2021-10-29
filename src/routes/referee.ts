@@ -284,6 +284,7 @@ router.post('/setTimeResult', (req, res, next) => {
             robot_id: results[3][0].robot_id,
             nazwa_robota: results[3][0].nazwa_robota,
             nazwa_kategorii: results[3][0].nazwa_kategorii,
+            nazwa_stanowiska: results[3][0].nazwa_stanowiska,
             czas_zakonczenia: new Date().toISOString(),
             robot_uuid: robot_uuid,
             czas_przejazdu: czas_przejazdu,

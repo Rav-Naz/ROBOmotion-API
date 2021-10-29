@@ -70,15 +70,23 @@ function WALKI_dodajWalke(res: express.Response, stanowisko_id: number, nastepna
                 return;
             }
             const walka = {
-                walka_id: (results as any)[2][0].walka_id,
+                czas_zakonczenia: null,
+                grupa_id: grupa_id,
+                kategoria_id: (results as any)[2][0].kategoria_id,
+                nastepna_walka_id: nastepna_walka_id === 0 ? null : nastepna_walka_id,
+                nazwa_grupy: (results as any)[2][0].nazwa_grupy,
+                nazwa_kategorii: (results as any)[2][0].nazwa_kategorii,
+                nazwa_stanowiska: (results as any)[2][0].nazwa_stanowiska,
                 robot1_id: null,
+                robot1_nazwa: null,
+                robot1_uuid: null,
                 robot2_id: null,
+                robot2_nazwa: null,
+                robot2_uuid: null,
+                stanowisko_id: stanowisko_id,
+                walka_id: (results as any)[2][0].walka_id,
                 wygrane_rundy_robot1: null,
                 wygrane_rundy_robot2: null,
-                czas_zakonczenia: null,
-                stanowisko_id: stanowisko_id,
-                nastepna_walka_id: nastepna_walka_id === 0 ? null : nastepna_walka_id,
-                grupa_id: grupa_id,
 
             };
             socketIO.default.getIO().emit("addFight", walka);
@@ -214,7 +222,11 @@ router.post('/addPostalCode', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response = results[0][0];
+        const response = {
+            pIsSucces: results[0][0].pIsSucces,
+            uzytkownik_id: results[0][0].uzytkownik_id,
+            kod_pocztowy: kod_pocztowy
+        };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("user/addPostalCode", response);
         Success.OK(res, response);
     });
