@@ -106,7 +106,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
     }
 
     if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
-        ClientError.locked(res, "Time to add Smash Robots category has ended!");
+        ClientError.locked(res, "errors.details.time-to-modify-ended-smash");
         return;
     }
 
@@ -163,6 +163,11 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
+    }
+
+    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
+        ClientError.badRequest(res, "errors.details.time-to-modify-ended-smash");
+        return;
     }
 
     db.query("CALL `KATEGORIE_ROBOTA_usunKategorieRobota(U)`(?, @p2, ?);;", [robot_uuid, kategoria_id], (err, results, fields) => {
@@ -343,6 +348,11 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
         return;
     }
 
+    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
+        ClientError.badRequest(res, "errors.details.time-to-modify-ended-smash");
+        return;
+    }
+
     db.query("CALL `ROBOTY_dodajRobota(U)`(?, ?, ?);", [nazwa, uzytkownik_uuid, kategoria_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -468,7 +478,7 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
 router.post('/addUserPhoneNumber', async (req, res, next) => {
 
     const body = req.body;
-    const numer_telefonu = body?.numer_telefonu;
+    const numer_telefonu = body?.numer_telefonu.toString().replace(/\s+/g, '');
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {

@@ -8,7 +8,7 @@ export default {
             const now = new Date();
             const uzytkownik_typ = (req.query.JWTdecoded as any).uzytkownik_typ;
             if (uzytkownik_typ === 0 && now > accessToModifyExpirationDate) {
-                ClientError.locked(res, "Time for modify ended!");
+                ClientError.badRequest(res, "errors.details.time-to-modify-ended");
                 return;
             }
             next();

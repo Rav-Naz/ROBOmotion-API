@@ -399,9 +399,12 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
 
     const body = req?.body;
     const kategoria_id = Number(body?.kategoria_id);
-    const stanowiskaLista: Array<number> = body?.stanowiskaLista; //lista ID
+    const stanowiskaLista: Array<number> = body?.stanowiskaLista; //lista ID (jednocześnie ilość grup 2,4,8, lub 16)
     const iloscDoFinalu = Number(body?.iloscDoFinalu);
+    const opcjaTworzenia = !isNaN(Number(body.opcjaTworzenia)) ? Number(body.opcjaTworzenia) : null; //null - drzewko finałowe + eliminacje, 0 - tylko eliminacje (ustawione), 1 - drzewko finałowe (puste) 
     const nazwyGrup = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    var wiadomoscZwrotna = '';
+   console.log(opcjaTworzenia)
     try {
         KATEGORIE.validator({ kategoria_id: kategoria_id });
         KATEGORIE.validator({ kategoria_id: iloscDoFinalu });
@@ -429,8 +432,9 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         return;
     });
 
+    
     if (blad) return;
-
+    
     // sprawdzenie stanowiska pod względem kategorii
     for (let index = 0; index < stanowiskaLista.length; index++) {
         const stanowiskoId = stanowiskaLista[index];
@@ -441,7 +445,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             ClientError.notAcceptable(res, err.message);
             break;
         }
-
+        
         const czyMa = (await referee.STANOWISKA_czyStanowiskoMaKategorie(res, stanowiskoId, kategoria_id) as any).pCzyMa;
         if (czyMa !== 1) {
             blad = true;
@@ -449,9 +453,11 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             break;
         }
     }
-
+    
+    
     if (blad) return;
-
+    
+    
     //pobranie robotow do ustawienia
     let roboty = await new Promise<Array<any>>((resolve, reject) => {
         db.query(`SELECT DISTINCT robot_uuid FROM ROBOTY
@@ -472,7 +478,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             }));
         });
     })
-
+    
     //sprawdzenie czy ilość stanowisk <= ilość do finalu <= ilość robotów
     if (stanowiskaLista.length > iloscDoFinalu) {
         ClientError.badRequest(res, `Ilość do finału jest mniejsza niż ilość stanowisk (${iloscDoFinalu} - ilość do finału < ${stanowiskaLista.length} - stanowiska)`)
@@ -491,7 +497,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         ClientError.badRequest(res, `Ilość robotów jest zbyt mała aby eliminacje miały sens (${roboty.length} - roboty, ${iloscDoFinalu} - ilość do finału). Zmniejsz ilość do finału.`)
         return;
     }
-
+    
     //sprawdzenie czy ilosc do finalu, ilosc stanowisk 2^n
     if (iloscDoFinalu !== 1 && iloscDoFinalu !== 2 && iloscDoFinalu !== 4 && iloscDoFinalu !== 8 && iloscDoFinalu !== 16 && iloscDoFinalu !== 32 && iloscDoFinalu !== 64 && iloscDoFinalu !== 128) {
         ClientError.badRequest(res, 'Ilość do finału nie jest równa 2^n')
@@ -501,7 +507,8 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         ClientError.badRequest(res, 'Ilość stanowisk nie jest równa 2^n')
         return;
     }
-
+    
+    
     const kategoria_nazwa = await new Promise<string>((resolve, reject) => {
         db.query(`SELECT KATEGORIE.nazwa FROM KATEGORIE WHERE KATEGORIE.kategoria_id = ?`, [kategoria_id], (err, results, fields) => {
             if (err?.sqlState === '45000') {
@@ -516,110 +523,125 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             resolve((results[0] as any).nazwa);
         });
     })
+    
+    if(opcjaTworzenia === null || opcjaTworzenia === 1) {
 
-    //DRZEWKO FINAŁU
-    //utwórz grupe finałową
-    if (iloscDoFinalu !== 1) {
-        const grupaFinalowaId = (await GRUPY_WALK_dodajGrupe(res, `FINAŁ - ${kategoria_nazwa}`, kategoria_id) as any).grupa_id;
-        //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
-        const iloscWalk = iloscDoFinalu / 2;
-        const maxDeep = Math.log2(iloscWalk) - 1;
+        //DRZEWKO FINAŁU
+        //utwórz grupe finałową
+        if (iloscDoFinalu !== 1) {
+            const grupaFinalowaId = (await GRUPY_WALK_dodajGrupe(res, `FINAŁ - ${kategoria_nazwa}`, kategoria_id) as any).grupa_id;
+            //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
+            const iloscWalk = iloscDoFinalu / 2;
+            const maxDeep = Math.log2(iloscWalk) - 1;
+            
+            //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
+            let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
         
-        //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
-        let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
-    
-        if (stanowiska.length < iloscWalk) {
-            for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
-                stanowiska = stanowiska.concat(stanowiska);
-            }
-        }
-        const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
-        const initial_length = iloscWalk * 2 - 1;
-        let do_wybrania = new Array(initial_length).fill(0);
-        let actual_length = initial_length;
-        let offset = 0;
-        for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
-            let pula = [...stanowiska];
-            if (i == maxDeepStanowiska + 1) {
-                while (do_wybrania.findIndex(b => b === 0) > 0) {
-                    do_wybrania[do_wybrania.findIndex(b => b === 0)] = pula.pop();
+            if (stanowiska.length < iloscWalk) {
+                for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
+                    stanowiska = stanowiska.concat(stanowiska);
                 }
-            } else {
-                let o = offset;
-                for (let j = 0; j < Math.pow(2, i); j++) {
-                    if (j % 2 === 0) {
-                        o += j / 2
+            }
+
+            const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
+            const initial_length = iloscWalk * 2 - 1;
+            let actual_length = initial_length;
+            let offset = 0;
+            let do_wybrania = new Array(initial_length).fill(stanowiskaLista.length > 1 ? 0 : stanowiskaLista[0]);
+            if(stanowiskaLista.length > 1) {
+                for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
+                    let pula = [...stanowiska];
+                    if (i == maxDeepStanowiska + 1) {
+                        while (do_wybrania.findIndex(b => b === 0) > 0) {
+                            do_wybrania[do_wybrania.findIndex(b => b === 0)] = pula.pop();
+                        }
+                    } else {
+                        let o = offset;
+                        for (let j = 0; j < Math.pow(2, i); j++) {
+                            if (j % 2 === 0) {
+                                o += j / 2
+                            }
+                            let s = j * actual_length
+                            do_wybrania[o + s] = pula.pop();
+                        }
+                        actual_length = (actual_length - 1) / 2;
+                        offset += 1;
                     }
-                    let s = j * actual_length
-                    do_wybrania[o + s] = pula.pop();
                 }
-                actual_length = (actual_length - 1) / 2;
-                offset += 1;
+
+            } 
+        
+            do_wybrania = do_wybrania.reverse();
+        
+            let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
+            let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
+        
+            while (stosWalk.length !== 0) {
+                let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
+                let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
+                if (nadrzednaWalka.poziom < maxDeep) {
+                    stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+                    stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+                }
+
             }
-        }
-    
-        do_wybrania = do_wybrania.reverse();
-    
-        let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
-        let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
-    
-        while (stosWalk.length !== 0) {
-            let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
-            let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
-            if (nadrzednaWalka.poziom < maxDeep) {
-                stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
-                stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
-            }
+            wiadomoscZwrotna += `Utworzono drzewko finałowe dla ${iloscDoFinalu} robotów, składające się z ${iloscWalk} walk rozłożonych przez ${maxDeep+1} szczeble. `
         }
     }
 
-    //ELIMINACJE
-    //wymieszaj roboty
-    var currentIndex = roboty.length,  randomIndex;
-    while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [roboty[currentIndex], roboty[randomIndex]] = [roboty[randomIndex], roboty[currentIndex]];
-    }
+    if(opcjaTworzenia === null || opcjaTworzenia === 0) {
 
-    //podziel roboty na grupy (losowo), ilością równe ilości stanowisk
-    const iloscGrup = stanowiskaLista.length;
-    let nowa: Array<Array<string>> = Array.from(Array(iloscGrup), () => []);
-    for (let j = 0; j < roboty.length; j++) {
-        nowa[j%iloscGrup].push(roboty[j])
-    }
-    const liczbaRobotow = roboty.length;
-    roboty = nowa;
-
-    //utwórz grupę eliminacyjną + literka
-    for (let index = 0; index < iloscGrup; index++) {
-        const nazwa = `ELIMINACJE gr. ${nazwyGrup[index]} - ${kategoria_nazwa}`;
-        const robotyWGrupie = roboty[index] as Array<string>;
-        try {
-            GRUPY_WALK.validator({nazwa: nazwa})
-        } catch (err) {
-            blad = true;
-            ClientError.notAcceptable(res, err.message);
-            break;
+        //ELIMINACJE
+        //wymieszaj roboty
+        var currentIndex = roboty.length,  randomIndex;
+        while (currentIndex != 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [roboty[currentIndex], roboty[randomIndex]] = [roboty[randomIndex], roboty[currentIndex]];
         }
+    
+        //podziel roboty na grupy (losowo), ilością równe ilości stanowisk
+        const iloscGrup = stanowiskaLista.length;
+        let nowa: Array<Array<string>> = Array.from(Array(iloscGrup), () => []);
+        for (let j = 0; j < roboty.length; j++) {
+            nowa[j%iloscGrup].push(roboty[j])
+        }
+        const liczbaRobotow = roboty.length;
+        roboty = nowa;
 
-        const grupaEliminacyjnaId = (await GRUPY_WALK_dodajGrupe(res, nazwa, kategoria_id) as any).grupa_id;
-
-        //w każdej grupie ustaw roboty, przeciwko sobie
-        for (let x = 0; x < robotyWGrupie.length; x++) {
-            for(let c = x + 1; c < robotyWGrupie.length; c++) {
-                await WALKI_dodajWalkeOrazRoboty(res, stanowiskaLista[index], grupaEliminacyjnaId, robotyWGrupie[x], robotyWGrupie[c]).catch(() => {
-                    blad = true;
-                    return;
-                });
-                if(blad) break;
+        //utwórz grupę eliminacyjną + literka
+        for (let index = 0; index < iloscGrup; index++) {
+            const nazwa = `ELIMINACJE gr. ${nazwyGrup[index]} - ${kategoria_nazwa}`;
+            const robotyWGrupie = roboty[index] as Array<string>;
+            try {
+                GRUPY_WALK.validator({nazwa: nazwa})
+            } catch (err) {
+                blad = true;
+                ClientError.notAcceptable(res, err.message);
+                break;
+            }
+    
+            const grupaEliminacyjnaId = (await GRUPY_WALK_dodajGrupe(res, nazwa, kategoria_id) as any).grupa_id;
+    
+            //w każdej grupie ustaw roboty, przeciwko sobie
+            for (let x = 0; x < robotyWGrupie.length; x++) {
+                for(let c = x + 1; c < robotyWGrupie.length; c++) {
+                    await WALKI_dodajWalkeOrazRoboty(res, stanowiskaLista[index], grupaEliminacyjnaId, robotyWGrupie[x], robotyWGrupie[c]).catch(() => {
+                        blad = true;
+                        return;
+                    });
+                    if(blad) break;
+                }
             }
         }
+
+        wiadomoscZwrotna += (`Utworzono ${iloscGrup} grup eliminacyjncyh o liczności ${(liczbaRobotow/iloscGrup)%1 > 0 ? (Math.floor((liczbaRobotow/iloscGrup)) + '-'
+        + (Math.floor((liczbaRobotow/iloscGrup))+1))  : (liczbaRobotow/iloscGrup)} robotów, z których każdej wyłoni się ${iloscDoFinalu/iloscGrup} finalistów.`)
+
     }
 
     if (blad) return;
-    Success.OK(res, `Utworzono ${iloscGrup} grup o liczności ${(liczbaRobotow/iloscGrup)%1 > 0 ? (Math.floor((liczbaRobotow/iloscGrup)) + '-'
-    + (Math.floor((liczbaRobotow/iloscGrup))+1))  : (liczbaRobotow/iloscGrup)} robotów, z każdej których wyłoni się ${iloscDoFinalu/iloscGrup} finalistów.`);
+    Success.OK(res, wiadomoscZwrotna);
 });
 
 export default router;
