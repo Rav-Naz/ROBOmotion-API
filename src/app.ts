@@ -16,7 +16,7 @@ import refereeRoutes from './routes/referee';
 import adminRoutes from './routes/admin';
 import emptyRoutes from './routes/empty';
 import deviceRoutes from './routes/device';
-import { apiRatelimit } from './utils/ddos_protection';
+// import { apiRatelimit } from './utils/ddos_protection';
 import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
@@ -26,7 +26,7 @@ const hostName = '127.0.0.1';
 const app = express();
 const httpServer = http.createServer(app);
 const corsOptions = {
-    origin: ['https://test.robomotion.com.pl', 'https://robomotion.com.pl', 'http://localhost:4200'],
+    origin: true,
     optionsSuccessStatus: 200,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT'],
     allowedHeaders: ['Content-Type', 'x-requested-with', 'Authorization', 'Accept', 'token'],
@@ -43,7 +43,7 @@ const port = Number(process.env.SERVER_PORT) || 8080;
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 
-app.use(apiRatelimit); //DDOS prtection
+// app.use(apiRatelimit); //DDOS prtection
 
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }))
