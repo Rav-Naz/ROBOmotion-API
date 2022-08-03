@@ -19,7 +19,7 @@ function KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res: express.Respons
         try {
             ROBOTY.validator({robot_uuid: robot_uuid});
             UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
             return;
@@ -44,7 +44,7 @@ export function KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora(uzytkownik_uuid
     return new Promise<object>((resolve, reject) => {
         try {
             UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-        } catch (err) {
+        } catch (err: any) {
             if (res) {
                 ClientError.notAcceptable(res, err.message);
             }
@@ -77,7 +77,7 @@ router.get('/checkIfUserIsConstructorOfRobot/:uzytkownik_uuid/:robot_uuid', (req
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -100,7 +100,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -152,7 +152,7 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -201,7 +201,7 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         UZYTKOWNICY.validator({uzytkownik_uuid: nowy_uzytkownik_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -242,7 +242,7 @@ router.get('/getConstructors/:robot_uuid', async (req, res, next) => {
 
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -279,7 +279,7 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
 
     try {
         KONSTRUKTORZY.validator({konstruktor_id: konstruktor_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -343,7 +343,7 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
     try {
         ROBOTY.validator({nazwa: nazwa});
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -385,7 +385,7 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
 
     try {
         ROBOTY.validator({nazwa: nazwa, robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -423,7 +423,7 @@ router.get('/getAllRobotsOfUser', (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
     try {
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -443,7 +443,7 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
 
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -483,7 +483,7 @@ router.post('/addUserPhoneNumber', async (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({numer_telefonu: numer_telefonu});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -517,7 +517,7 @@ router.put('/editUser', access.default.canModify, async (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({nazwisko: nazwisko, imie: imie});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -593,7 +593,7 @@ router.put('/changeUserPassword', async (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({haslo: noweHaslo});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }

@@ -23,7 +23,7 @@ function WALKI_pobierzWalke(res: express.Response, walka_id: number): Promise<ob
     return new Promise<object>((resolve, reject) => {
         try {
             WALKI.validator({walka_id: walka_id});
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
             return;
@@ -48,7 +48,7 @@ export function KATEGORIE_czyToKategoriaWalki(res: express.Response, kategoria_i
     return new Promise<object>((resolve, reject) => {
         try {
             KATEGORIE.validator({kategoria_id: kategoria_id})
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
             return;
@@ -73,7 +73,7 @@ router.get('/isItFightingCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params.kategoria_id);
     try {
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -105,7 +105,7 @@ router.get('/getRobot/:robot_uuid', (req, res, next) => {
     const robot_uuid = req.params.robot_uuid;
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -144,7 +144,7 @@ router.get('/getRefereesForThePosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -167,7 +167,7 @@ router.get('/getPosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -209,7 +209,7 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
         ROBOTY.validator({robot_uuid: robot_uuid});
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -242,7 +242,7 @@ router.post('/registerUser', (req, res, next) => {
     const lang = body?.lang ? body?.lang : 'en';
     try {
         UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -306,7 +306,7 @@ router.post('/remind', (req, res, next) => {
     const lang = body?.lang ? body?.lang : 'en';
     try {
         UZYTKOWNICY.validator({email: email});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -360,7 +360,7 @@ router.post('/reset-password', (req, res, next) => {
     try {
         POTWIERDZENIA.validator({kod: kod})
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, haslo: haslo});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -386,7 +386,7 @@ router.get('/confirmCode/:uzytkownik_uuid/:kod/:czy_na_telefon', (req, res, next
     try {
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
         POTWIERDZENIA.validator({kod: kod, czy_na_telefon: czy_na_telefon});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -410,7 +410,7 @@ router.post('/loginUser', (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({email: email, haslo: haslo});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -442,7 +442,7 @@ router.get('/getFight/:walka_id', (req, res, next) => {
     const walka_id = Number(req.params?.walka_id);
     try {
         WALKI.validator({walka_id: walka_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -475,7 +475,7 @@ router.get('/getAllFightsForGroup/:grupa_id', (req, res, next) => {
     const grupa_id = Number(req.params?.grupa_id);
     try {
         GRUPY_WALK.validator({grupa_id: grupa_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -499,7 +499,7 @@ router.get('/getAllFightsForCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -523,7 +523,7 @@ router.get('/getAllFightsForRobot/:robot_uuid', (req, res, next) => {
     const robot_uuid = req.params?.robot_uuid;
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -547,7 +547,7 @@ router.get('/getAllFightsForPosiotion/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params?.stanowisko_id);
     try {
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -571,7 +571,7 @@ router.get('/getWinnersForGroup/:grupa_id', (req, res, next) => {
     const grupa_id = Number(req.params?.grupa_id);
     try {
         GRUPY_WALK.validator({grupa_id: grupa_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -594,7 +594,7 @@ router.get('/getWinnersForCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -650,7 +650,7 @@ router.get('/getAllTimesForCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -674,7 +674,7 @@ router.get('/getAllTimesForRobot/:robot_uuid', (req, res, next) => {
     const robot_uuid = req.params?.robot_uuid;
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -698,7 +698,7 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params?.stanowisko_id);
     try {
         STANOWISKA.validator({stanowisko_id: stanowisko_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }

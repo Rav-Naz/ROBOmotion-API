@@ -15,7 +15,7 @@ router.post('/confirmSendMessage', (req, res, next) => {
 
     try {
         WIADOMOSCI.validator({wiadomosc_id: wiadomosc_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
     }
     

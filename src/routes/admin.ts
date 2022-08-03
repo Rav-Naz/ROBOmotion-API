@@ -23,7 +23,7 @@ function GRUPY_WALK_dodajGrupe(res: express.Response, nazwa: string, kategoria_i
     return new Promise<object>((resolve, reject) => {
         try {
             GRUPY_WALK.validator({ nazwa: nazwa, kategoria_id: kategoria_id });
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
             return;
@@ -54,7 +54,7 @@ function WALKI_dodajWalke(res: express.Response, stanowisko_id: number, nastepna
     return new Promise<object>((resolve, reject) => {
         try {
             WALKI.validator({ stanowisko_id: stanowisko_id, nastepna_walka_id: nastepna_walka_id, grupa_id: grupa_id });
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
         }
@@ -101,7 +101,7 @@ function WALKI_dodajWalkeOrazRoboty(res: express.Response, stanowisko_id: number
             WALKI.validator({ stanowisko_id: stanowisko_id, grupa_id: grupa_id});
             ROBOTY.validator({robot_uuid: robot1_uuid})
             ROBOTY.validator({robot_uuid: robot2_uuid})
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
         }
@@ -131,7 +131,7 @@ router.post('/addGroup', (req, res, next) => {
     const kategoria_id = Number(body?.kategoria_id);
     try {
         GRUPY_WALK.validator({ nazwa: nazwa, kategoria_id: kategoria_id });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -155,7 +155,7 @@ router.delete('/deleteGroup', (req, res, next) => {
     const grupa_id = Number(body?.grupa_id);
     try {
         GRUPY_WALK.validator({ grupa_id: grupa_id });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -183,7 +183,7 @@ router.put('/confirmArrival', (req, res, next) => {
     const robot_uuid = body?.robot_uuid;
     try {
         ROBOTY.validator({ robot_uuid: robot_uuid });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -209,7 +209,7 @@ router.post('/addPostalCode', (req, res, next) => {
     const kod_pocztowy = body?.kod_pocztowy;
     try {
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy})
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -241,7 +241,7 @@ router.post('/addFight', (req, res, next) => {
 
     try {
         WALKI.validator({ stanowisko_id: stanowisko_id, nastepna_walka_id: nastepna_walka_id, grupa_id: grupa_id });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -265,7 +265,7 @@ router.post('/addFightAndRobots', (req, res, next) => {
         ROBOTY.validator({ robot_uuid: robot1_uuid });
         ROBOTY.validator({ robot_uuid: robot2_uuid });
         WALKI.validator({ stanowisko_id: stanowisko_id, grupa_id: grupa_id });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -286,7 +286,7 @@ router.post('/addRobotToFight', (req, res, next) => {
     try {
         WALKI.validator({ walka_id: walka_id });
         ROBOTY.validator({ robot_uuid: robot_uuid });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -312,7 +312,7 @@ router.delete('/removeFight', (req, res, next) => {
 
     try {
         WALKI.validator({ walka_id: walka_id });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
     }
 
@@ -342,7 +342,7 @@ router.post('/sendPrivateMessage', (req, res, next) => {
     try {
         UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid })
         WIADOMOSCI.validator({ tresc: tresc });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -371,7 +371,7 @@ router.delete('/deleteTimeResult', (req, res, next) => {
 
     try {
         WYNIKI_CZASOWE.validator({ wynik_id: wynik_id })
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -414,7 +414,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         if (iloscDoFinalu > 16) {
             throw new Error('Ilość do finału jest zbyt duża');
         }
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -440,7 +440,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         const stanowiskoId = stanowiskaLista[index];
         try {
             STANOWISKA.validator({ stanowisko_id: stanowiskoId })
-        } catch (err) {
+        } catch (err: any) {
             blad = true;
             ClientError.notAcceptable(res, err.message);
             break;
@@ -493,10 +493,10 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         ClientError.badRequest(res, `Ilość robotów w grupie jest zbyt mała (${pog.toPrecision(3)} - w grupie, ${roboty.length} - ogółem). Zmniejsz liczbę stanowisk (grup).`)
         return;
     }
-    if (iloscDoFinalu > (roboty.length/2)) {
-        ClientError.badRequest(res, `Ilość robotów jest zbyt mała aby eliminacje miały sens (${roboty.length} - roboty, ${iloscDoFinalu} - ilość do finału). Zmniejsz ilość do finału.`)
-        return;
-    }
+    // if (iloscDoFinalu > (roboty.length/2)) {
+    //     ClientError.badRequest(res, `Ilość robotów jest zbyt mała aby eliminacje miały sens (${roboty.length} - roboty, ${iloscDoFinalu} - ilość do finału). Zmniejsz ilość do finału.`)
+    //     return;
+    // }
     
     //sprawdzenie czy ilosc do finalu, ilosc stanowisk 2^n
     if (iloscDoFinalu !== 1 && iloscDoFinalu !== 2 && iloscDoFinalu !== 4 && iloscDoFinalu !== 8 && iloscDoFinalu !== 16 && iloscDoFinalu !== 32 && iloscDoFinalu !== 64 && iloscDoFinalu !== 128) {
@@ -615,7 +615,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             const robotyWGrupie = roboty[index] as Array<string>;
             try {
                 GRUPY_WALK.validator({nazwa: nazwa})
-            } catch (err) {
+            } catch (err: any) {
                 blad = true;
                 ClientError.notAcceptable(res, err.message);
                 break;

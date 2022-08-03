@@ -19,7 +19,7 @@ export function STANOWISKA_czyStanowiskoMaKategorie(res: express.Response, stano
         try {
             STANOWISKA.validator({ stanowisko_id: stanowisko_id });
             KATEGORIE.validator({ kategoria_id: kategoria_id })
-        } catch (err) {
+        } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
             return;
@@ -48,7 +48,7 @@ router.get('/checkIfRobotHasCategory/:robot_uuid/:kategoria_id', (req, res, next
     try {
         ROBOTY.validator({ robot_uuid: robot_uuid });
         KATEGORIE.validator({ kategoria_id: kategoria_id })
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -74,7 +74,7 @@ router.get('/checkIfPositionHasCategory/:stanowisko_id/:kategoria_id', (req, res
     try {
         STANOWISKA.validator({ stanowisko_id: stanowisko_id });
         KATEGORIE.validator({ kategoria_id: kategoria_id })
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -92,7 +92,7 @@ router.get('/getRefereePositions/:uzytkownik_uuid', (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -115,7 +115,7 @@ router.get('/getUserContactDetails/:uzytkownik_uuid', (req, res, next) => {
 
     try {
         UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -139,7 +139,7 @@ router.get('/getUsers', (req, res, next) => {
     
     try {
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -166,7 +166,7 @@ router.get('/getRobotsOfUserInCategory/:uzytkownik_uuid/:kategoria_id', (req, re
     try {
         UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
         KATEGORIE.validator({kategoria_id: kategoria_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -195,7 +195,7 @@ router.post('/setFightResult', (req, res, next) => {
 
     try {
         WALKI.validator({wygrane_rundy_robot1: wygrane_rundy_robot1, wygrane_rundy_robot2: wygrane_rundy_robot2, walka_id: walka_id});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -235,7 +235,7 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         WIADOMOSCI.validator({tresc: tresc});
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -265,7 +265,7 @@ router.post('/setTimeResult', (req, res, next) => {
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
         WYNIKI_CZASOWE.validator({czas_przejazdu: czas_przejazdu, kategoria_id: kategoria_id, stanowisko_id: stanowisko_id})
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
@@ -307,7 +307,7 @@ router.put('/updateTimeResult', (req, res, next) => {
 
     try {
         WYNIKI_CZASOWE.validator({czas_przejazdu: czas_przejazdu, wynik_id: wynik_id})
-    } catch (err) {
+    } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
