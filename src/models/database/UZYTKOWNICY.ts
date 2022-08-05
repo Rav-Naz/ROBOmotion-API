@@ -10,6 +10,10 @@ export class UZYTKOWNICY{
     haslo?: string | undefined;
     kod_pocztowy?: string | null | undefined;
     data_rejestracji?: Date | undefined;
+    preferowane_jedzenie?: number | null | undefined;
+    rozmiar_koszulki?: number | null | undefined;
+    czy_odebral_starterpack?: number | undefined;
+    czy_opiekun?: number | undefined;
     czy_potwierdzony_email?: number | undefined;
     czy_potwierdzony_numer_telefonu?: number | undefined;
 
@@ -45,6 +49,18 @@ export class UZYTKOWNICY{
         }
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {
             throw new Error('UZYTKOWNICY.data_rejestracji is not valid');
+        }
+        if ((typeof body.preferowane_jedzenie !== "number" || body.preferowane_jedzenie.toString().length > 2 || isNaN(body.preferowane_jedzenie)) && typeof body.preferowane_jedzenie !== "undefined" && typeof body.preferowane_jedzenie !== "object") {
+            throw new Error('UZYTKOWNICY.preferowane_jedzenie is not valid');
+        }
+        if ((typeof body.rozmiar_koszulki !== "number" || body.rozmiar_koszulki.toString().length > 2 || isNaN(body.rozmiar_koszulki)) && typeof body.rozmiar_koszulki !== "undefined" && typeof body.rozmiar_koszulki !== "object") {
+            throw new Error('UZYTKOWNICY.rozmiar_koszulki is not valid');
+        }
+        if ((typeof body.czy_odebral_starterpack !== "number" || body.czy_odebral_starterpack.toString().length > 2 || isNaN(body.czy_odebral_starterpack)) && typeof body.czy_odebral_starterpack !== "undefined" && typeof body.czy_odebral_starterpack !== "object") {
+            throw new Error('UZYTKOWNICY.czy_odebral_starterpack is not valid');
+        }
+        if ((typeof body.czy_opiekun !== "number" || body.czy_opiekun.toString().length > 2 || isNaN(body.czy_opiekun)) && typeof body.czy_opiekun !== "undefined" && typeof body.czy_opiekun !== "object") {
+            throw new Error('UZYTKOWNICY.czy_opiekun is not valid');
         }
         if ((typeof body.czy_potwierdzony_email !== "number" || body.czy_potwierdzony_email.toString().length > 1 || isNaN(body.czy_potwierdzony_email)) && typeof body.czy_potwierdzony_email !== "undefined") {
             throw new Error('UZYTKOWNICY.czy_potwierdzony_email is not valid');

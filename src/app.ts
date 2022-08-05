@@ -55,9 +55,9 @@ app.use(cors(corsOptions));
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
 app.use('/user', JWT.default.verify, auth.default.authorize(0), userRoutes);
-app.use('/referee', JWT.default.verify, auth.default.authorize(1), refereeRoutes);
-app.use('/admin', JWT.default.verify, auth.default.authorize(2), adminRoutes);
-app.use('/device', auth.default.authorize(3), deviceRoutes);
+app.use('/referee', JWT.default.verify, auth.default.authorize(2), refereeRoutes);
+app.use('/admin', JWT.default.verify, auth.default.authorize(3), adminRoutes);
+app.use('/device', auth.default.authorize(4), deviceRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 

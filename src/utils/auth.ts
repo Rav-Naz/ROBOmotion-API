@@ -6,7 +6,7 @@ export default {
     authorize: (typ: number) => {
         return (req: express.Request, res: express.Response, next: express.NextFunction) => {
             let blad = false;
-            if (typ <= 2) {
+            if (typ <= 3) {
                 const decoded = req.query.JWTdecoded as any;
                 if (!decoded) {
                     blad = true;

@@ -1,8 +1,8 @@
 import { ClientError } from '../responses/client_errors';
 import express from 'express';
 
-const accessToModifyExpirationDate = new Date(2021, 10, 14, 23, 59, 59);
-const accessToSmashRobots= new Date(2021, 10, 1, 23, 59, 59);
+const accessToModifyExpirationDate = new Date(2022, 10, 14, 23, 59, 59);
+const accessToSmashRobots= new Date(2022, 10, 1, 23, 59, 59);
 export default {
     canModify: (req: express.Request, res: express.Response, next: express.NextFunction) => {
             const now = new Date();

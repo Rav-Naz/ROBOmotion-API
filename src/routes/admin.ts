@@ -404,7 +404,6 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
     const opcjaTworzenia = !isNaN(Number(body.opcjaTworzenia)) ? Number(body.opcjaTworzenia) : null; //null - drzewko finałowe + eliminacje, 0 - tylko eliminacje (ustawione), 1 - drzewko finałowe (puste) 
     const nazwyGrup = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
     var wiadomoscZwrotna = '';
-   console.log(opcjaTworzenia)
     try {
         KATEGORIE.validator({ kategoria_id: kategoria_id });
         KATEGORIE.validator({ kategoria_id: iloscDoFinalu });

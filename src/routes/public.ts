@@ -239,16 +239,21 @@ router.post('/registerUser', (req, res, next) => {
     const nazwisko = body?.nazwisko;
     const email = body?.email;
     const haslo = body?.haslo;
+    const numer_telefonu = body?.numer_telefonu;
+    const kod_pocztowy = body?.kod_pocztowy;
+    const jedzenie = body?.preferowane_jedzenie;
+    const rozmiar_koszulki = body?.rozmiar_koszulki;
+    const czy_opiekun = body?.czy_opiekun;
     const lang = body?.lang ? body?.lang : 'en';
     try {
-        UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo});
+        UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, preferowane_jedzenie: jedzenie, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun});
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
 
-    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString()], async (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?,?,?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString(), numer_telefonu, kod_pocztowy, jedzenie, rozmiar_koszulki, czy_opiekun], async (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -261,7 +266,7 @@ router.post('/registerUser', (req, res, next) => {
     
         var options = (email: string, locals?: object) => {
             return {
-                from: `ROBO~motion <${process.env.EMAIL_FROM_ADDR}>`,
+                from: `XChallenge <${process.env.EMAIL_FROM_ADDR}>`,
                 to: email,
                 subject: lang === 'en' ? 'Account activation' : 'Aktywacja konta',
                 html: lang === 'en' ? registerEmailTemplateEng(locals) : registerEmailTemplate(locals) 
@@ -325,13 +330,13 @@ router.post('/remind', (req, res, next) => {
     
         var options = (email: string, locals?: object) => {
             return {
-                from: `ROBO~motion <${process.env.EMAIL_FROM_ADDR}>`,
+                from: `XChallenge <${process.env.EMAIL_FROM_ADDR}>`,
                 to: email,
                 subject: lang === 'en' ? 'Have you forgotten your password?' : 'Zapomniałeś hasła?',
                 html: lang === 'en' ? resetPasswordEmailTemplateEng(locals) : resetPasswordEmailTemplate(locals) 
             };
           };
-
+        
         const kod = results[0][0].kod;
         const uzytkownik_uuid = results[1][0].uzytkownik_uuid;
           
