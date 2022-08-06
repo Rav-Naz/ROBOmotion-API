@@ -105,11 +105,6 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
         return;
     }
 
-    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
-        ClientError.locked(res, "errors.details.time-to-modify-ended-smash");
-        return;
-    }
-
     if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
         const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
         if((czyJest as any).pCzyJest == 0) {
@@ -163,11 +158,6 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
-    }
-
-    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
-        ClientError.badRequest(res, "errors.details.time-to-modify-ended-smash");
-        return;
     }
 
     db.query("CALL `KATEGORIE_ROBOTA_usunKategorieRobota(U)`(?, @p2, ?);;", [robot_uuid, kategoria_id], (err, results, fields) => {
@@ -345,11 +335,6 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
         KATEGORIE.validator({kategoria_id: kategoria_id});
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
-        return;
-    }
-
-    if(access.default.getSmashRobotsExpirationDate() < new Date() && kategoria_id === 1) {
-        ClientError.badRequest(res, "errors.details.time-to-modify-ended-smash");
         return;
     }
 

@@ -1,22 +1,28 @@
 import express from 'express';
 import { Success } from '../responses/success';
 import { env } from 'process';
-import * as access from './access';
+import time_constraints from './time_constraints';
+import register_addons from './register_addons';
 
 const router = express.Router();
 
-const eventDate = new Date(2021, 10, 28, 9, 0, 0);
 router.get('/info', (req, res, next) => {
 
     const streamLink = env.WS_STREAMLINK;
 
     Success.OK(res, {
-        eventDate: eventDate,
+        eventDate: time_constraints.getTimeConstraint('Zawody'),
         streamLink: streamLink,
-        accessToModifyExpirationDate: access.default.getExpirationDate(),
-        accessToSmashRobots: access.default.getSmashRobotsExpirationDate()
+        accessToModifyExpirationDate: time_constraints.getTimeConstraint('Rejestracja')
     })
 })
 
+router.get('/registerAddons', (req, res, next) => {
+
+    Success.OK(res, {
+        rozmiaryKoszulek: register_addons.getRozmiaryKoszulek(),
+        jedzenie: register_addons.getJedzenie()
+    })
+})
 
 export default router;

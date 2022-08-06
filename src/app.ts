@@ -21,6 +21,11 @@ import * as socketIO from './utils/socket';
 import * as JWT from './utils/jwt';
 import * as auth from './utils/auth';
 import * as Nodemailer from './utils/nodemailer'
+import db from './utils/database';
+import * as time_constraints from './utils/time_constraints';
+import * as register_addons from './utils/register_addons';
+import { ROZMIAR_KOSZULKI } from './models/database/ROZMIAR_KOSZULKI';
+import { JEDZENIE } from './models/database/JEDZENIE';
 
 const hostName = '127.0.0.1';
 const app = express();
@@ -62,5 +67,44 @@ app.use('/device', auth.default.authorize(4), deviceRoutes);
 app.use(emptyRoutes); //When can't resolve the path
 
 const server = httpServer.listen(port, hostName, () => {
+    db.query("SELECT * FROM `OGRANICZENIA_CZASOWE`", [], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            return;
+        }
+        results.forEach((element: any) => {
+            var nazwa = String(element.nazwa);
+            var data_rozpoczecia = new Date(element.data_rozpoczecia);
+            var data_zakonczenia = new Date(element.data_zakonczenia);
+            time_constraints.default.addToTimeConstraints({nazwa, data_rozpoczecia, data_zakonczenia});
+        });
+    });
+    db.query("SELECT * FROM `JEDZENIE`", [], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            return;
+        }
+
+        results.forEach((element: any) => {
+            try {
+                JEDZENIE.validator({nazwa:element.nazwa});
+            } catch (err: any) {
+                console.log(err)
+                return;
+            }
+            register_addons.default.addJedzenie(element.nazwa);
+        });
+    });
+    db.query("SELECT * FROM `ROZMIARY_KOSZULEK`", [], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            return;
+        }
+        results.forEach((element: any) => {
+            try {
+                ROZMIAR_KOSZULKI.validator({rozmiar:element.rozmiar});
+            } catch (err: any) {
+                console.log(err)
+                return;
+            }
+            register_addons.default.addRozmiarKoszulki(element.rozmiar);
+        });    });
     console.log(`Server running at http://${hostName}:${port}`);
 });
