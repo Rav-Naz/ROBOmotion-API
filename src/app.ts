@@ -6,6 +6,7 @@ import swaggerUI from 'swagger-ui-express';
 import * as swaggerDoc from './swagger.json';
 import * as http from 'http';
 import cors from 'cors';
+import fileUpload from 'express-fileupload';
 
 dotenv.config();
 
@@ -56,6 +57,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(morgan('short'));
 
 app.use(cors(corsOptions));
+
+app.use(fileUpload({
+    createParentPath: true
+}));
 
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);

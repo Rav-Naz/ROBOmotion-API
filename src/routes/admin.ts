@@ -202,36 +202,6 @@ router.put('/confirmArrival', (req, res, next) => {
     });
 });
 
-router.post('/addPostalCode', (req, res, next) => {
-
-    const body = req?.body;
-    const uzytkownik_uuid = body?.uzytkownik_uuid;
-    const kod_pocztowy = body?.kod_pocztowy;
-    try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy})
-    } catch (err: any) {
-        ClientError.notAcceptable(res, err.message);
-        return;
-    }
-
-    db.query("CALL `UZYTKOWNICY_dodajKodPocztowy(A)`(?, ?);", [uzytkownik_uuid, kod_pocztowy], (err, results, fields) => {
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-        const response = {
-            pIsSucces: results[0][0].pIsSucces,
-            uzytkownik_id: results[0][0].uzytkownik_id,
-            kod_pocztowy: kod_pocztowy
-        };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("user/addPostalCode", response);
-        Success.OK(res, response);
-    });
-});
-
 router.post('/addFight', (req, res, next) => {
 
     const body = req?.body;

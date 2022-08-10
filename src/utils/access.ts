@@ -12,5 +12,16 @@ export default {
                 return;
             }
             next();
-        }
+        },
+    canModifyDocumentation: (req: express.Request, res: express.Response, next: express.NextFunction) => {
+            const now = new Date();
+            const dokumentacje = time_constraints.getTimeConstraint("Dokumentacje");
+            const uzytkownik_typ = (req.query.JWTdecoded as any).uzytkownik_typ;
+            if (uzytkownik_typ == 0 && (now > dokumentacje?.data_zakonczenia!)) {
+                ClientError.badRequest(res, "errors.details.time-to-modify-ended");
+                return;
+            }
+            next();
+        },
+
 }

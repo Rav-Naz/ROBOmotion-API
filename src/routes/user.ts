@@ -10,7 +10,8 @@ import db from '../utils/database';
 import * as access from '../utils/access';
 import * as socketIO from '../utils/socket';
 import auth from '../utils/auth';
-
+import fileUpload from 'express-fileupload';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -460,6 +461,154 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
     });
 });
 
+router.post('/uploadDocumentation', access.default.canModifyDocumentation, async (req, res) => {
+
+    const body = req.body;
+    const robot_uuid = body?.robot_uuid;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        ROBOTY.validator({robot_uuid: robot_uuid});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
+        if((czyJest as any).pCzyJest == 0) {
+            ClientError.unauthorized(res, "User is not constructor of a robot");
+            return;
+        }
+    }
+
+    try {
+        if(!req.files) {
+            ClientError.notAcceptable(res, "No file sended");
+        } else {
+            let doc = req.files.documentation as fileUpload.UploadedFile;
+            if (doc.size > (5 * 1024 * 1024)) {
+                ClientError.payloadTooLarge(res, "File is too large")
+                return;
+            }
+            if (typeof doc != 'object' || doc == undefined || doc == null || (!doc.name.includes(".doc") && !doc.name.includes(".docx") && !doc.name.includes(".pdf"))) {
+                ClientError.notAcceptable(res, "Invalid file format")
+                return;
+            }
+
+            const fileType = doc.name.split('.').reverse()[0]
+            const path = './documentations/' + robot_uuid + '.' + fileType;
+            
+            if (fs.existsSync('./documentations/'+robot_uuid+'.docx')) {
+                fs.unlinkSync('./documentations/'+robot_uuid+'.docx');
+            }
+            if (fs.existsSync('./documentations/'+robot_uuid+'.doc')) {
+                fs.unlinkSync('./documentations/'+robot_uuid+'.doc');
+            }
+            if (fs.existsSync('./documentations/'+robot_uuid+'.pdf')) {
+                fs.unlinkSync('./documentations/'+robot_uuid+'.pdf');
+            }
+            
+            doc.mv(path);
+
+            db.query("CALL `ROBOTY_dodajDokumentacje(U)`(?, ?);", [robot_uuid, path], (err, results, fields) => {
+                if (err?.sqlState === '45000') {
+                    ClientError.badRequest(res, err.sqlMessage);
+                    return;
+                } else if (err) {
+                    ServerError.internalServerError(res, err.sqlMessage);
+                    return;
+                }
+            });
+            const resp = {
+                robot_uuid: robot_uuid,
+                path: path,
+                isSucces: true,
+            };
+            
+            socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/uploadDocumentation", resp);
+            Success.OK(res,resp)
+        }
+    } catch (err) {
+        ServerError.internalServerError(res);
+        return;
+    }
+});
+
+router.get('/downloadDocumentation/:robot_uuid', async (req, res) => {
+
+    const robot_uuid = req.params?.robot_uuid;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        ROBOTY.validator({robot_uuid: robot_uuid});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
+        if((czyJest as any).pCzyJest == 0) {
+            ClientError.unauthorized(res, "User is not constructor of a robot");
+            return;
+        }
+    }
+
+    db.query("CALL `ROBOTY_pobierzDokumentacje(U)`(?);", [robot_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        res.download(results[0][0].link_do_dokumentacji);
+    });
+
+});
+
+router.post('/addFilm', access.default.canModifyDocumentation, async (req, res, next) => {
+
+    const body = req.body;
+    const link_do_filmiku = body?.link_do_filmiku as string;
+    const robot_uuid = body?.robot_uuid;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        ROBOTY.validator({robot_uuid: robot_uuid});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
+        if((czyJest as any).pCzyJest == 0) {
+            ClientError.unauthorized(res, "User is not constructor of a robot");
+            return;
+        }
+    }
+
+    db.query("CALL `ROBOTY_dodajFilmik(U)`(?, ?);", [robot_uuid, link_do_filmiku], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        const resp = {
+            robot_id: results[0][0].robot_id,
+            robot_uuid: robot_uuid,
+            nazwa: link_do_filmiku        };
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addFilm", resp);
+        Success.OK(res, resp);
+    });
+});
+
 router.post('/addUserPhoneNumber', async (req, res, next) => {
 
     const body = req.body;
@@ -481,15 +630,44 @@ router.post('/addUserPhoneNumber', async (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-
         const uzytkownik = {
-            uzytkownik_id: results[2][0].uzytkownik_id,
+            uzytkownik_id: results[0][0].uzytkownik_id,
             uzytkownik_uuid: uzytkownik_uuid,
             numer_telefonu: numer_telefonu,
-            isSucces: results[2][0].pIsSucces
+            isSucces: results[0][0].pIsSucces
         };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/addUserPhoneNumber", uzytkownik);
         Success.OK(res, uzytkownik);
+    });
+});
+
+router.post('/addPostalCode', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    const kod_pocztowy = body?.kod_pocztowy;
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_dodajKodPocztowy(A)`(?, ?);", [uzytkownik_uuid, kod_pocztowy], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            pIsSucces: results[0][0].pIsSucces,
+            uzytkownik_id: results[0][0].uzytkownik_id,
+            kod_pocztowy: kod_pocztowy
+        };
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("user/addPostalCode", response);
+        Success.OK(res, response);
     });
 });
 

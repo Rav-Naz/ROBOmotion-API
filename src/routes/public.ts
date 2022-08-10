@@ -241,10 +241,11 @@ router.post('/registerUser', (req, res, next) => {
     const haslo = body?.haslo;
     const numer_telefonu = body?.numer_telefonu;
     const kod_pocztowy = body?.kod_pocztowy;
-    const jedzenie = body?.preferowane_jedzenie;
-    const rozmiar_koszulki = body?.rozmiar_koszulki;
+    const jedzenie = Number(body?.preferowane_jedzenie);
+    const rozmiar_koszulki = Number(body?.rozmiar_koszulki);
     const czy_opiekun = body?.czy_opiekun;
     const lang = body?.lang ? body?.lang : 'en';
+
     try {
         UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, preferowane_jedzenie: jedzenie, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun});
     } catch (err: any) {

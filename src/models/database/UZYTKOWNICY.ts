@@ -34,7 +34,7 @@ export class UZYTKOWNICY{
         if ((typeof body.nazwisko !== "string" || body.nazwisko.length > 40 || body.nazwisko.length < 2) && typeof body.nazwisko !== "undefined") {
             throw new Error('UZYTKOWNICY.nazwisko is not valid');
         }
-        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 20 || body.numer_telefonu.length < 7) && typeof body.numer_telefonu !== "undefined" && typeof body.kod_pocztowy !== "object") {
+        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 20 || body.numer_telefonu.length < 7) && typeof body.numer_telefonu !== "undefined" && typeof body.numer_telefonu !== "object") {
             throw new Error('UZYTKOWNICY.numer_telefonu is not valid');
         }
         const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
