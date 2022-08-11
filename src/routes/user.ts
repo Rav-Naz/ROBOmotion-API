@@ -467,6 +467,7 @@ router.post('/uploadDocumentation', access.default.canModifyDocumentation, async
     const robot_uuid = body?.robot_uuid;
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
+    // Success.OK(res);
     try {
         ROBOTY.validator({robot_uuid: robot_uuid});
     } catch (err: any) {
@@ -603,7 +604,7 @@ router.post('/addFilm', access.default.canModifyDocumentation, async (req, res, 
         const resp = {
             robot_id: results[0][0].robot_id,
             robot_uuid: robot_uuid,
-            nazwa: link_do_filmiku        };
+            link_do_filmiku: link_do_filmiku        };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addFilm", resp);
         Success.OK(res, resp);
     });
@@ -671,7 +672,7 @@ router.post('/addPostalCode', (req, res, next) => {
     });
 });
 
-router.put('/editUser', access.default.canModify, async (req, res, next) => {
+router.put('/editUser',  async (req, res, next) => {
 
     const body = req.body;
     const imie = body?.imie;

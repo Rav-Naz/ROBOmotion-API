@@ -13,7 +13,8 @@ router.get('/info', (req, res, next) => {
     Success.OK(res, {
         eventDate: time_constraints.getTimeConstraint('Zawody'),
         streamLink: streamLink,
-        accessToModifyExpirationDate: time_constraints.getTimeConstraint('Rejestracja')
+        accessToModifyExpirationDate: time_constraints.getTimeConstraint('Rejestracja'),
+        accesToSendDocumentation: time_constraints.getTimeConstraint('Dokumentacje')
     })
 })
 
