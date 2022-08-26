@@ -17,6 +17,7 @@ import * as Nodemailer from "../utils/nodemailer";
 import fs from 'fs';
 import path from 'path';
 import time_constraints from '../utils/time_constraints';
+import visitor_counter from '../utils/visitor_counter';
 
 
 const router = express.Router();
@@ -731,6 +732,13 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
 
         Success.OK(res, results[0]);
     });
+});
+
+router.get('/currentVisitors', (req, res, next) => {
+    
+    var current = visitor_counter.getIleOsobNaWydarzeniu();
+    Success.OK(res, {currentVisitors: current})
+    
 });
 
 

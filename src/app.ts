@@ -13,6 +13,7 @@ dotenv.config();
 import publicRoutes from './routes/public';
 import siteRoutes from './utils/site';
 import userRoutes from './routes/user';
+import volunteerRoutes from './routes/volunteer';
 import refereeRoutes from './routes/referee';
 import adminRoutes from './routes/admin';
 import emptyRoutes from './routes/empty';
@@ -25,6 +26,7 @@ import * as Nodemailer from './utils/nodemailer'
 import db from './utils/database';
 import * as time_constraints from './utils/time_constraints';
 import * as register_addons from './utils/register_addons';
+import * as visitor_counter from './utils/visitor_counter';
 import { ROZMIAR_KOSZULKI } from './models/database/ROZMIAR_KOSZULKI';
 import { JEDZENIE } from './models/database/JEDZENIE';
 
@@ -65,6 +67,7 @@ app.use(fileUpload({
 app.use('/site', siteRoutes);
 app.use('/public', publicRoutes);
 app.use('/user', JWT.default.verify, auth.default.authorize(0), userRoutes);
+app.use('/volunteer', JWT.default.verify, auth.default.authorize(1), volunteerRoutes);
 app.use('/referee', JWT.default.verify, auth.default.authorize(2), refereeRoutes);
 app.use('/admin', JWT.default.verify, auth.default.authorize(3), adminRoutes);
 app.use('/device', auth.default.authorize(4), deviceRoutes);
@@ -111,5 +114,11 @@ const server = httpServer.listen(port, hostName, () => {
             }
             register_addons.default.addRozmiarKoszulki(element.rozmiar);
         });    });
+    db.query("CALL `ILE_OSOB_NA_WYDARZENIU_ileOsob(D)`();", (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            return;
+        }
+        visitor_counter.default.setIleOsobNaWydarzeniu(results[0][0].iloscOsob)
+    });
     console.log(`Server running at http://${hostName}:${port}`);
 });

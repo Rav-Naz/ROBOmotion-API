@@ -1,6 +1,6 @@
 <?php
 //The URL with parameters / query string.
-$url = 'https://api.xchallenge.pl/device/removeJunks';
+$url = 'https://api.xchallenge.pl/device/saveCurrentVisitorsCount';
  
 
 // use key 'http' even if you send the request to https://...

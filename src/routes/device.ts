@@ -4,6 +4,7 @@ import { ClientError } from '../responses/client_errors';
 import { ServerError } from '../responses/server_errors';
 import { Success } from '../responses/success';
 import db from '../utils/database';
+import * as visitor_counter from '../utils/visitor_counter';
 
 
 const router = express.Router();
@@ -44,6 +45,21 @@ router.get('/getRecipients', (req, res, next) => {
         }
 
         Success.OK(res, results[0]);
+    });
+});
+
+router.get('/saveCurrentVisitorsCount', (req, res, next) => {
+    
+    db.query("CALL `ILE_OSOB_NA_WYDARZENIU_zapisz(D)`(?)",[visitor_counter.default.getIleOsobNaWydarzeniu()], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res);
     });
 });
 
