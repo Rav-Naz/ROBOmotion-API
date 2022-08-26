@@ -253,6 +253,61 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
     });
 });
 
+router.put('/confirmStarterpackGiven', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+
+    try {
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_potwierdzWydanieStarterpacka(S)`(?);", [uzytkownik_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        var resp = {
+            uzytkownik_uuid: uzytkownik_uuid,
+            czy_odebral_starterpack: 1
+        }
+        socketIO.default.getIO().to("referee").to("admin").emit("user/giveStarterpack", resp);
+        Success.OK(res);
+    });
+});
+
+router.put('/confirmArrival', (req, res, next) => {
+
+    const body = req?.body;
+    const robot_uuid = body?.robot_uuid;
+    const value = body?.value;
+    try {
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `ROBOTY_potwierdzDotarcie(S)`(?, @p2, ?);", [robot_uuid, value ? 1 : 0], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const robot = results[0][0];
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/newArrival", robot);
+        Success.OK(res, robot);
+    });
+});
+
 router.post('/setTimeResult', (req, res, next) => {
 
     const body = req.body;

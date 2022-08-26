@@ -6,6 +6,7 @@ export class ROBOTY{
     czy_dotarl?: number | undefined;
     link_do_dokumentacji?: string | undefined;
     link_do_filmiku?: string | undefined;
+    powod_odrzucenia?: string | undefined;
 
     static validator(body: ROBOTY = {robot_id: undefined, robot_uuid: undefined, nazwa: undefined, czy_dotarl: undefined}): void  {
         if ((typeof body.robot_id !== "number" || body.robot_id.toString().length > 6 || isNaN(body.robot_id)) && typeof body.robot_id !== "undefined") {
@@ -25,6 +26,9 @@ export class ROBOTY{
         }
         if ((typeof body.link_do_filmiku !== "string" || body.link_do_filmiku.length > 500 || body.link_do_filmiku.length < 1) && typeof body.link_do_filmiku !== "undefined") {
             throw new Error('ROBOTY.link_do_filmiku is not valid');
+        }
+        if ((typeof body.powod_odrzucenia !== "string" || body.powod_odrzucenia.length > 1000 || body.powod_odrzucenia.length < 1) && typeof body.powod_odrzucenia !== "undefined") {
+            throw new Error('ROBOTY.powod_odrzucenia is not valid');
         }
     }
 }

@@ -133,7 +133,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addRobotCategory", kategoria_robota);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/addRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -177,7 +177,7 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteRobotCategory", kategoria_robota);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/deleteRobotCategory", kategoria_robota);
         Success.OK(res, kategoria_robota);
     });
 });
@@ -220,7 +220,7 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
             robot_uuid: robot_uuid
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${nowy_uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addConstructor", utworzony_konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${nowy_uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/addConstructor", utworzony_konstruktor);
         Success.OK(res, utworzony_konstruktor);
     });
 });
@@ -299,7 +299,7 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
             isSucces: results[0][0].pIsSucces
         };
 
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${konstruktor.uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteConstructor", konstruktor);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`users/${konstruktor.uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/deleteConstructor", konstruktor);
         Success.OK(res, konstruktor);
     });
 });
@@ -399,7 +399,7 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
             nazwa: nazwa,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/updateRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/updateRobot", robot);
         Success.OK(res, robot);
     });
 });
@@ -455,7 +455,7 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
             robot_uuid: robot_uuid,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/deleteRobot", robot);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/deleteRobot", robot);
         // socketIO.default.getIO().in(`robots/${robot_uuid}`).c
         Success.OK(res, robot);
     });
@@ -527,7 +527,7 @@ router.post('/uploadDocumentation', access.default.canModifyDocumentation, async
                 isSucces: true,
             };
             
-            socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/uploadDocumentation", resp);
+            socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/uploadDocumentation", resp);
             Success.OK(res,resp)
         }
     } catch (err) {
@@ -605,7 +605,7 @@ router.post('/addFilm', access.default.canModifyDocumentation, async (req, res, 
             robot_id: results[0][0].robot_id,
             robot_uuid: robot_uuid,
             link_do_filmiku: link_do_filmiku        };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).emit("robots/addFilm", resp);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/addFilm", resp);
         Success.OK(res, resp);
     });
 });
@@ -667,7 +667,7 @@ router.post('/addPostalCode', (req, res, next) => {
             uzytkownik_id: results[0][0].uzytkownik_id,
             kod_pocztowy: kod_pocztowy
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("user/addPostalCode", response);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").to("referee").to("admin").emit("user/addPostalCode", response);
         Success.OK(res, response);
     });
 });
@@ -702,7 +702,7 @@ router.put('/editUser',  async (req, res, next) => {
             nazwisko: nazwisko,
             isSucces: results[0][0].pIsSucces
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/editUser", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("users/editUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });
@@ -743,7 +743,7 @@ router.delete('/deleteUser', access.default.canModify,  async (req, res, next) =
             isSucces: results[0][0].pIsSucces
         };
         
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("users/deleteUser", uzytkownik);
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("users/deleteUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
 });

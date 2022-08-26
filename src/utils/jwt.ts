@@ -42,5 +42,14 @@ export default {
                 next();
             }
     
-        }
+        },
+    getUserType: (token: string): number => {
+        let typ = 0;
+        JWT.verify(token, secret, { ignoreExpiration: false }, function(err, decoded) {
+                delete decoded?.iat;
+                delete decoded?.exp;
+                typ = decoded ? decoded.uzytkownik_typ : 0;
+        });
+        return typ;
+    }
 }

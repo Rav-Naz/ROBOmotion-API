@@ -177,18 +177,20 @@ router.delete('/deleteGroup', (req, res, next) => {
     });
 });
 
-router.put('/confirmArrival', (req, res, next) => {
+router.put('/addRobotRejection', (req, res, next) => {
 
     const body = req?.body;
     const robot_uuid = body?.robot_uuid;
+    const powod_odrzucenia = body?.powod_odrzucenia;
+
     try {
-        ROBOTY.validator({ robot_uuid: robot_uuid });
+        ROBOTY.validator({ robot_uuid: robot_uuid, powod_odrzucenia: powod_odrzucenia});
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `ROBOTY_potwierdzDotarcie(A)`(?, @p2);", [robot_uuid], (err, results, fields) => {
+    db.query("CALL `ROBOTY_dodajPowodOdrzucenia(A)`(?, ?);", [robot_uuid, powod_odrzucenia == 'null' ? null : powod_odrzucenia], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -197,8 +199,33 @@ router.put('/confirmArrival', (req, res, next) => {
             return;
         }
         const robot = results[0][0];
-        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/newArrival", robot);
+        socketIO.default.getIO().to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/addRobotRejection", robot);
         Success.OK(res, robot);
+    });
+});
+
+router.put('/changeUserType', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+    const uzytkownik_typ = Number(body?.uzytkownik_typ);
+
+    try {
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, uzytkownik_typ: uzytkownik_typ});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_zmienTypUzytkownika(A)`(?, ?);", [uzytkownik_uuid, uzytkownik_typ], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        Success.OK(res);
     });
 });
 
