@@ -4,6 +4,7 @@ import { ClientError } from '../responses/client_errors';
 import { ServerError } from '../responses/server_errors';
 import { Success } from '../responses/success';
 import db from '../utils/database';
+import sms from '../utils/sms';
 import * as visitor_counter from '../utils/visitor_counter';
 
 
@@ -61,6 +62,11 @@ router.get('/saveCurrentVisitorsCount', (req, res, next) => {
 
         Success.OK(res);
     });
+});
+
+router.get('/refreshCallapiToken', (req, res, next) => {
+    sms.login();
+    Success.OK(res);
 });
 
 router.get('/removeJunks', (req, res, next) => {

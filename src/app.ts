@@ -29,6 +29,7 @@ import * as register_addons from './utils/register_addons';
 import * as visitor_counter from './utils/visitor_counter';
 import { ROZMIAR_KOSZULKI } from './models/database/ROZMIAR_KOSZULKI';
 import { JEDZENIE } from './models/database/JEDZENIE';
+import sms from './utils/sms';
 
 const hostName = '127.0.0.1';
 const app = express();
@@ -74,7 +75,7 @@ app.use('/device', auth.default.authorize(4), deviceRoutes);
 
 app.use(emptyRoutes); //When can't resolve the path
 
-const server = httpServer.listen(port, hostName, () => {
+const server = httpServer.listen(port, hostName, async () => {
     db.query("SELECT * FROM `OGRANICZENIA_CZASOWE`", [], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             return;
@@ -120,5 +121,6 @@ const server = httpServer.listen(port, hostName, () => {
         }
         visitor_counter.default.setIleOsobNaWydarzeniu(results[0][0].iloscOsob)
     });
+    await sms.login();
     console.log(`Server running at http://${hostName}:${port}`);
 });
