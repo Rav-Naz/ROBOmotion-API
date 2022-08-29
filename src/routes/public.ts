@@ -143,6 +143,22 @@ router.get('/getAllRobots', (req, res, next) => {
     });
 });
 
+router.get('/getAllGroups', (req, res, next) => {
+
+    db.query("CALL `GRUPY_WALK_pobierzGrupy(*)`();", (err, results, fields) => {
+
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, results[0]);
+    });
+});
+
 router.get('/getRefereesForThePosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {

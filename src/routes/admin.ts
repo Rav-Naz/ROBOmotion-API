@@ -144,7 +144,6 @@ router.post('/addGroup', (req, res, next) => {
             nazwa: nazwa,
             kategoria_id: kategoria_id
         }
-        socketIO.default.getIO().emit("addGroup", grupa);
         Success.OK(res, grupa);
     });
 });
@@ -367,7 +366,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
     const kategoria_id = Number(body?.kategoria_id);
     const stanowiskaLista: Array<number> = body?.stanowiskaLista; //lista ID (jednocześnie ilość grup 2,4,8, lub 16)
     const iloscDoFinalu = Number(body?.iloscDoFinalu);
-    const opcjaTworzenia = !isNaN(Number(body.opcjaTworzenia)) ? Number(body.opcjaTworzenia) : null; //null - drzewko finałowe + eliminacje, 0 - tylko eliminacje (ustawione), 1 - drzewko finałowe (puste) 
+    const opcjaTworzenia = body.opcjaTworzenia == null ? null : Number(body.opcjaTworzenia); //null - drzewko finałowe + eliminacje, 0 - tylko eliminacje (ustawione), 1 - drzewko finałowe (puste) 
     const nazwyGrup = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
     var wiadomoscZwrotna = '';
     try {
@@ -428,7 +427,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         db.query(`SELECT DISTINCT robot_uuid FROM ROBOTY
         LEFT JOIN KATEGORIE_ROBOTA
         ON ROBOTY.robot_id = KATEGORIE_ROBOTA.robot_id
-        WHERE ROBOTY.czy_dotarl = 1 AND KATEGORIE_ROBOTA.kategoria_id = ?`, [kategoria_id], (err, results, fields) => {
+        WHERE ROBOTY.czy_dotarl = 1 AND ROBOTY.powod_odrzucenia IS NULL AND KATEGORIE_ROBOTA.kategoria_id = ?`, [kategoria_id], (err, results, fields) => {
             if (err?.sqlState === '45000') {
                 ClientError.badRequest(res, err.sqlMessage);
                 reject();
@@ -454,8 +453,8 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         return;
     }
     const pog = roboty.length/stanowiskaLista.length;
-    if ( pog < 3) {
-        ClientError.badRequest(res, `Ilość robotów w grupie jest zbyt mała (${pog.toPrecision(3)} - w grupie, ${roboty.length} - ogółem). Zmniejsz liczbę stanowisk (grup).`)
+    if ( pog < 3 && opcjaTworzenia != 1 ) {
+        ClientError.badRequest(res, `Ilość robotów w grupie elimiacyjnej jest zbyt mała (${pog.toPrecision(1)} - w grupie, ${roboty.length} - ogółem). Zmniejsz liczbę stanowisk (grup) lub przełącz tryb tworzenia na 'tylko finał'.`)
         return;
     }
     // if (iloscDoFinalu > (roboty.length/2)) {
@@ -489,8 +488,8 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         });
     })
     
-    if(opcjaTworzenia === null || opcjaTworzenia === 1) {
-
+    if(opcjaTworzenia == null || opcjaTworzenia == 1) {
+        
         //DRZEWKO FINAŁU
         //utwórz grupe finałową
         if (iloscDoFinalu !== 1) {
@@ -506,14 +505,13 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
                 for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
                     stanowiska = stanowiska.concat(stanowiska);
                 }
-            }
-
+            }            
             const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
             const initial_length = iloscWalk * 2 - 1;
             let actual_length = initial_length;
             let offset = 0;
             let do_wybrania = new Array(initial_length).fill(stanowiskaLista.length > 1 ? 0 : stanowiskaLista[0]);
-            if(stanowiskaLista.length > 1) {
+            if(stanowiskaLista.length > 0) {
                 for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
                     let pula = [...stanowiska];
                     if (i == maxDeepStanowiska + 1) {
@@ -533,28 +531,30 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
                         offset += 1;
                     }
                 }
-
+                
             } 
-        
+            
             do_wybrania = do_wybrania.reverse();
-        
+            
             let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
             let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
-        
-            while (stosWalk.length !== 0) {
-                let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
-                let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
-                if (nadrzednaWalka.poziom < maxDeep) {
-                    stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
-                    stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+            while (stosWalk.length !== 0 && do_wybrania.length !== 0) {
+                try {                    
+                    let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
+                    let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
+                    if (nadrzednaWalka.poziom < maxDeep) {
+                        stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+                        stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
+                    }
+                } catch (error) {  
                 }
-
+                
             }
             wiadomoscZwrotna += `Utworzono drzewko finałowe dla ${iloscDoFinalu} robotów, składające się z ${iloscWalk} walk rozłożonych przez ${maxDeep+1} szczeble. `
         }
     }
 
-    if(opcjaTworzenia === null || opcjaTworzenia === 0) {
+    if(opcjaTworzenia == null || opcjaTworzenia == 0) {
 
         //ELIMINACJE
         //wymieszaj roboty

@@ -119,7 +119,7 @@ const server = httpServer.listen(port, hostName, async () => {
         if (err?.sqlState === '45000') {
             return;
         }
-        visitor_counter.default.setIleOsobNaWydarzeniu(results[0][0].iloscOsob)
+        visitor_counter.default.setIleOsobNaWydarzeniu(results != undefined ? results[0][0].iloscOsob : 0)
     });
     await sms.login();
     console.log(`Server running at http://${hostName}:${port}`);
