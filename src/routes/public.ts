@@ -752,7 +752,7 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
 
 router.get('/currentVisitors', (req, res, next) => {
     
-    var current = visitor_counter.getIleOsobNaWydarzeniu();
+    let current = visitor_counter.getIleOsobNaWydarzeniu();
     Success.OK(res, {currentVisitors: current})
     
 });

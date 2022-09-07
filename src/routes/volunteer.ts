@@ -10,14 +10,14 @@ const router = express.Router();
 
 router.get('/addOnePerson', (req, res, next) => {
 
-    var current = visitor_counter.addOne();
+    let current = visitor_counter.addOne();
     socketIO.default.getIO().emit("currentVisitors", current)
     Success.OK(res, {currentVisitors: current})
 });
 
 router.get('/removeOnePerson', (req, res, next) => {
     
-    var current = visitor_counter.removeOne();
+    let current = visitor_counter.removeOne();
     socketIO.default.getIO().emit("currentVisitors", current)
     Success.OK(res, {currentVisitors: current})
     

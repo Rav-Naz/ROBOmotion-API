@@ -1,5 +1,5 @@
 
-var ile_osob_na_wydarzeniu: number = 0;
+let ile_osob_na_wydarzeniu: number = 0;
 
 export default {
     setIleOsobNaWydarzeniu(ile: number) : number {

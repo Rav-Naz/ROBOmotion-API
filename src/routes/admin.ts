@@ -14,6 +14,7 @@ import { Success } from '../responses/success';
 import * as socketIO from '../utils/socket';
 import * as referee from '../routes/referee';
 import * as publicRoutes from '../routes/public';
+import { KATEGORIE_STANOWISKA } from '../models/database/KATEGORIE_STANOWISKA';
 
 
 
@@ -148,7 +149,7 @@ router.post('/addGroup', (req, res, next) => {
     });
 });
 
-router.delete('/deleteGroup', (req, res, next) => {
+router.post('/deleteGroup', (req, res, next) => {
 
     const body = req?.body;
     const grupa_id = Number(body?.grupa_id);
@@ -171,6 +172,7 @@ router.delete('/deleteGroup', (req, res, next) => {
             grupa_id: grupa_id,
             isSucces: results[0][0].pIsSucces
         };
+        console.log(grupa)
         socketIO.default.getIO().emit("deleteGroup", grupa);
         Success.OK(res, grupa);
     });
@@ -329,6 +331,35 @@ router.delete('/removeFight', (req, res, next) => {
     });
 });
 
+router.post('/editFight', (req, res, next) => {
+
+    const body = req?.body;
+    const walka_id = Number(body?.walka_id);
+    const robot_uuid = body?.robot_uuid;
+    const robot1czy2 = body?.robot1czy2;
+
+    try {
+        WALKI.validator({ walka_id: walka_id });
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `WALKI_edytujWalke(A)`(?,?,?, @p2);", [robot_uuid, walka_id, robot1czy2], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const walka = results[2][0];
+        socketIO.default.getIO().emit("addRobotToFight", walka);
+        Success.OK(res, walka);
+    });
+});
+
 router.delete('/deleteTimeResult', (req, res, next) => {
 
     const body = req?.body;
@@ -351,6 +382,213 @@ router.delete('/deleteTimeResult', (req, res, next) => {
         }
         const response = results[0][0];
         socketIO.default.getIO().emit("deleteTimeResult", response);
+        Success.OK(res, response);
+    });
+});
+
+router.post('/addPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const nazwa = body?.nazwa;
+
+    try {
+        STANOWISKA.validator({nazwa: nazwa})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `STANOWISKA_dodajStanowisko(A)`(?);", [nazwa], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowisko_id: results[0][0].stanowisko_id,
+            nazwa_stanowiska: nazwa,
+            kategorie: null,
+            sedziowie: null
+        };
+        Success.OK(res, response);
+    });
+});
+
+router.put('/editPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const nazwa = body?.nazwa;
+
+    try {
+        STANOWISKA.validator({stanowisko_id: stanowisko_id,nazwa: nazwa})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `STANOWISKA_edytujStanowisko(A)`(?,?);", [stanowisko_id,nazwa], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowisko_id: stanowisko_id,
+            nazwa_stanowiska: nazwa
+        };
+        Success.OK(res, response);
+    });
+});
+
+router.delete('/removePosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+
+    try {
+        STANOWISKA.validator({stanowisko_id: stanowisko_id})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `STANOWISKA_usunStanowisko(A)`(?);", [stanowisko_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowisko_id: stanowisko_id,
+        };
+        Success.OK(res, response);
+    });
+});
+
+
+router.post('/addRefereeToPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+
+    try {
+        STANOWISKA.validator({stanowisko_id: stanowisko_id})
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `STANOWISKA_SEDZIOWIE_dodajSedziegoDoStanowiska(A)`(?,?);", [uzytkownik_uuid,stanowisko_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowiska_sedziowie_id: results[0][0].stanowiska_sedziowie_id,
+            stanowisko_id: stanowisko_id,
+            uzytkownik_uuid: uzytkownik_uuid
+        };
+        Success.OK(res, response);
+    });
+});
+
+router.delete('/removeRefereeFromPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+
+    try {
+        STANOWISKA.validator({stanowisko_id: stanowisko_id})
+        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `STANOWISKA_SEDZIOWIE_usunSedziegoZeStanowiska(A)`(?,?);", [uzytkownik_uuid,stanowisko_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowisko_id: stanowisko_id,
+            uzytkownik_uuid: uzytkownik_uuid
+        };
+        Success.OK(res, response);
+    });
+});
+
+router.post('/addCategoryToPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const kategoria_id = Number(body?.kategoria_id);
+
+    try {
+        KATEGORIE_STANOWISKA.validator({stanowisko_id: stanowisko_id, kategoria_id: kategoria_id})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `KATEGORIE_STANOWISKA_dodajKategorieStanowiska(A)`(?,?);", [stanowisko_id,kategoria_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowiska_sedziowie_id: results[0][0].kategorie_stanowiska_id,
+            stanowisko_id: stanowisko_id,
+            kategoria_id: kategoria_id
+        };
+        Success.OK(res, response);
+    });
+});
+
+router.delete('/removeCategoryFromPosition', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const kategoria_id = Number(body?.kategoria_id);
+
+    try {
+        KATEGORIE_STANOWISKA.validator({stanowisko_id: stanowisko_id, kategoria_id: kategoria_id})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `KATEGORIE_STANOWISKA_usunKategorieStanowiska(A)`(?,?);", [stanowisko_id,kategoria_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response =  {
+            stanowisko_id: stanowisko_id,
+            kategoria_id: kategoria_id
+        };
         Success.OK(res, response);
     });
 });
@@ -500,7 +738,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             
             //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
             let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
-        
+            
             if (stanowiska.length < iloscWalk) {
                 for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
                     stanowiska = stanowiska.concat(stanowiska);
@@ -512,10 +750,10 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             let offset = 0;
             let do_wybrania = new Array(initial_length).fill(stanowiskaLista.length > 1 ? 0 : stanowiskaLista[0]);
             if(stanowiskaLista.length > 0) {
-                for (let i = 0; i <= maxDeepStanowiska + 1; i++) {
+                for (let i = 0; i <= (maxDeepStanowiska + 1); i++) {
                     let pula = [...stanowiska];
                     if (i == maxDeepStanowiska + 1) {
-                        while (do_wybrania.findIndex(b => b === 0) > 0) {
+                        while (do_wybrania.findIndex(b => b === 0) >= 0) {
                             do_wybrania[do_wybrania.findIndex(b => b === 0)] = pula.pop();
                         }
                     } else {
@@ -535,7 +773,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             } 
             
             do_wybrania = do_wybrania.reverse();
-            
+            let walkao3miejsce = (await WALKI_dodajWalke(res, do_wybrania[0] as number, 0, grupaFinalowaId) as any).walka_id as number;
             let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
             let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
             while (stosWalk.length !== 0 && do_wybrania.length !== 0) {

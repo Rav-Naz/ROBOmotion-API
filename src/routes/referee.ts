@@ -222,7 +222,11 @@ router.post('/setFightResult', (req, res, next) => {
         }
 
         socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("robots/setFightResult", walka);
+        // socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("robots/setFightResult", nastepna_walka);
         socketIO.default.getIO().emit("setFightResult", walka);
+        if(results[2]) {
+            socketIO.default.getIO().emit("addRobotToFight", results[2][0]);
+        }
         Success.OK(res, walka);
     });
 });
