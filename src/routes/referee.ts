@@ -12,6 +12,7 @@ import { Success } from '../responses/success';
 import db from '../utils/database';
 import * as socketIO from '../utils/socket';
 import sms from '../utils/sms';
+import { GRUPY_WALK } from '../models/database/GRUPY_WALK';
 
 const router = express.Router();
 
@@ -254,12 +255,15 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
             return;
         }
 
-        var numery = results[0];
+        
+        let numery = results[0];
         for (let i = 0; i < numery.length; i++) {
-            sms.sendSms(numery[i],tresc)            
+            db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [numery[i].uzytkownik_uuid, tresc], (err, results, fields) => {
+                sms.sendSms(numery[i].numer_telefonu,tresc)            
+            })
         }
 
-        var response = {
+        let response = {
             sendedCount: numery.length
         }
 
@@ -287,7 +291,7 @@ router.put('/confirmStarterpackGiven', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        var resp = {
+        let resp = {
             uzytkownik_uuid: uzytkownik_uuid,
             czy_odebral_starterpack: 1
         }
@@ -403,6 +407,93 @@ router.put('/updateTimeResult', (req, res, next) => {
     });
 });
 
+router.delete('/deleteTimeResult', (req, res, next) => {
+
+    const body = req?.body;
+    const wynik_id = body?.wynik_id;
+
+    try {
+        WYNIKI_CZASOWE.validator({ wynik_id: wynik_id })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `WYNIKI_CZASOWE_usunWynik(A)`(?,@p2);", [wynik_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            success: results[0][0],
+            wynik_id: wynik_id
+        };
+        socketIO.default.getIO().emit("deleteTimeResult", response);
+        Success.OK(res, response);
+    });
+});
+
+router.put('/activateGroup', (req, res, next) => {
+
+    const body = req?.body;
+    const grupa_id = body?.grupa_id;
+
+    try {
+        GRUPY_WALK.validator({grupa_id: grupa_id})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `GRUPY_WALK_aktywujGrupe(S)`(?);", [grupa_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            grupa_id: grupa_id,
+            czy_aktywna: 1
+        }
+        socketIO.default.getIO().emit("activateGroup", response);
+        Success.OK(res, response);
+    });
+});
+
+router.put('/deactivateGroup', (req, res, next) => {
+
+    const body = req?.body;
+    const grupa_id = body?.grupa_id;
+
+    try {
+        GRUPY_WALK.validator({grupa_id: grupa_id})
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `GRUPY_WALK_dezaktywujGrupe(S)`(?);", [grupa_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            grupa_id: grupa_id,
+            czy_aktywna: 0
+        }
+        socketIO.default.getIO().emit("activateGroup", response);
+        Success.OK(res, response);
+    });
+});
+
 router.post('/sendPrivateMessage', (req, res, next) => {
 
     const body = req?.body;
@@ -425,18 +516,19 @@ router.post('/sendPrivateMessage', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        var numer_telefonu = results[0][0].numer_telefonu;
+        let numer_telefonu = results[0][0].numer_telefonu;
         const wiadomosc = {
             numer_telefonu: numer_telefonu,
             uzytkownik_uuid: uzytkownik_uuid,
             tresc: tresc
         }
         if(numer_telefonu != null) {
-            sms.sendSms(numer_telefonu, tresc);
+            db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [uzytkownik_uuid, tresc], (err, results, fields) => {
+                sms.sendSms(numer_telefonu, tresc);
+            })
         }
         Success.OK(res, wiadomosc);
     });
 });
-
 
 export default router;

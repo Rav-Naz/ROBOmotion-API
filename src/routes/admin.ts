@@ -15,6 +15,7 @@ import * as socketIO from '../utils/socket';
 import * as referee from '../routes/referee';
 import * as publicRoutes from '../routes/public';
 import { KATEGORIE_STANOWISKA } from '../models/database/KATEGORIE_STANOWISKA';
+import sms from '../utils/sms';
 
 
 
@@ -360,32 +361,6 @@ router.post('/editFight', (req, res, next) => {
     });
 });
 
-router.delete('/deleteTimeResult', (req, res, next) => {
-
-    const body = req?.body;
-    const wynik_id = body?.wynik_id;
-
-    try {
-        WYNIKI_CZASOWE.validator({ wynik_id: wynik_id })
-    } catch (err: any) {
-        ClientError.notAcceptable(res, err.message);
-        return;
-    }
-
-    db.query("CALL `WYNIKI_CZASOWE_usunWynik(A)`(?,@p2);", [wynik_id], (err, results, fields) => {
-        if (err?.sqlState === '45000') {
-            ClientError.badRequest(res, err.sqlMessage);
-            return;
-        } else if (err) {
-            ServerError.internalServerError(res, err.sqlMessage);
-            return;
-        }
-        const response = results[0][0];
-        socketIO.default.getIO().emit("deleteTimeResult", response);
-        Success.OK(res, response);
-    });
-});
-
 router.post('/addPosition', (req, res, next) => {
 
     const body = req?.body;
@@ -590,6 +565,50 @@ router.delete('/removeCategoryFromPosition', (req, res, next) => {
             kategoria_id: kategoria_id
         };
         Success.OK(res, response);
+    });
+});
+
+router.post('/sendMessageToAllUsers', (req, res, next) => {
+
+    const body = req?.body;
+    const tresc = body?.tresc;
+
+    try {
+        WIADOMOSCI.validator({tresc: tresc});
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_pobierzDaneKontaktoweWszystkichUzytkownikow(A)`();", [], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        
+        let numery = results[0];
+        
+        let response = {
+            sendedCount: numery.length,
+            tresc: tresc,
+            wiadomosc_id: 0,
+            uzytkownik_id: null,
+            czas_nadania: new Date()
+        }
+        db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [null, tresc], (err, results, fields) => {       
+            response['wiadomosc_id']=results[0].wiadomosc_id;
+            for (let i = 0; i < numery.length; i++) {
+                sms.sendSms(numery[i].numer_telefonu, tresc)            
+            }
+        })
+
+        socketIO.default.getIO().emit("sendMessageToAllUsers", response);
+
+        Success.OK(res,response);
     });
 });
 
