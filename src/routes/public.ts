@@ -25,7 +25,7 @@ const router = express.Router();
 function WALKI_pobierzWalke(res: express.Response, walka_id: number): Promise<object> {
     return new Promise<object>((resolve, reject) => {
         try {
-            WALKI.validator({walka_id: walka_id});
+            WALKI.validator({ walka_id: walka_id });
         } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
@@ -50,7 +50,7 @@ function WALKI_pobierzWalke(res: express.Response, walka_id: number): Promise<ob
 export function KATEGORIE_czyToKategoriaWalki(res: express.Response, kategoria_id: number): Promise<object> {
     return new Promise<object>((resolve, reject) => {
         try {
-            KATEGORIE.validator({kategoria_id: kategoria_id})
+            KATEGORIE.validator({ kategoria_id: kategoria_id })
         } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
@@ -75,13 +75,13 @@ export function KATEGORIE_czyToKategoriaWalki(res: express.Response, kategoria_i
 router.get('/isItFightingCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params.kategoria_id);
     try {
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    KATEGORIE_czyToKategoriaWalki(res,kategoria_id).catch(() => {
+    KATEGORIE_czyToKategoriaWalki(res, kategoria_id).catch(() => {
         return;
     }).then((result) => {
         Success.OK(res, result as object);
@@ -107,7 +107,7 @@ router.get('/getAllCategories', (req, res, next) => {
 router.get('/getRobot/:robot_uuid', (req, res, next) => {
     const robot_uuid = req.params.robot_uuid;
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -162,7 +162,7 @@ router.get('/getAllGroups', (req, res, next) => {
 router.get('/getRefereesForThePosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id});
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -185,7 +185,7 @@ router.get('/getRefereesForThePosition/:stanowisko_id', (req, res, next) => {
 router.get('/getPosition/:stanowisko_id', (req, res, next) => {
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id});
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -205,7 +205,7 @@ router.get('/getPosition/:stanowisko_id', (req, res, next) => {
     });
 });
 
-router.get('/getPositions',(req, res, next) => {
+router.get('/getPositions', (req, res, next) => {
 
     db.query("CALL `STANOWISKA_pobierzWszystkieStanowiska(*)`();", (err, results, fields) => {
 
@@ -225,9 +225,9 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
     const kategoria_id = Number(req.params.kategoria_id);
     const stanowisko_id = Number(req.params.stanowisko_id);
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id});
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id });
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -267,7 +267,7 @@ router.post('/registerUser', (req, res, next) => {
     const lang = body?.lang ? body?.lang : 'en';
 
     try {
-        UZYTKOWNICY.validator({imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, preferowane_jedzenie: jedzenie, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun});
+        UZYTKOWNICY.validator({ imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, preferowane_jedzenie: jedzenie, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -291,26 +291,26 @@ router.post('/registerUser', (req, res, next) => {
             return;
         }
 
-    
+
         var options = (email: string, locals?: object) => {
             return {
                 from: `XChallenge <${process.env.EMAIL_FROM_ADDR}>`,
                 to: email,
                 subject: lang === 'en' ? 'Account activation' : 'Aktywacja konta',
-                html: lang === 'en' ? registerEmailTemplateEng(locals) : registerEmailTemplate(locals) 
+                html: lang === 'en' ? registerEmailTemplateEng(locals) : registerEmailTemplate(locals)
             };
-          };
+        };
 
         const kod = results[0][0].kod;
 
         const nowyUzytkownik = {
-              uzytkownik_id: results[1][0].uzytkownik_id,
-              uzytkownik_uuid: results[1][0].uzytkownik_uuid,
-              imie: imie,
-              nazwisko: nazwisko,
-              email: email
-          };
-          
+            uzytkownik_id: results[1][0].uzytkownik_id,
+            uzytkownik_uuid: results[1][0].uzytkownik_uuid,
+            imie: imie,
+            nazwisko: nazwisko,
+            email: email
+        };
+
         let blad = false;
         const result = await Nodemailer.default.getTransporter().sendMail(
             options(email, {
@@ -322,7 +322,7 @@ router.post('/registerUser', (req, res, next) => {
             return;
         });
 
-        if(blad) return;
+        if (blad) return;
 
         Success.OK(res, nowyUzytkownik);
     });
@@ -338,7 +338,7 @@ router.post('/remind', (req, res, next) => {
     const email = body?.email;
     const lang = body?.lang ? body?.lang : 'en';
     try {
-        UZYTKOWNICY.validator({email: email});
+        UZYTKOWNICY.validator({ email: email });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -355,19 +355,19 @@ router.post('/remind', (req, res, next) => {
             return;
         }
 
-    
+
         var options = (email: string, locals?: object) => {
             return {
                 from: `XChallenge <${process.env.EMAIL_FROM_ADDR}>`,
                 to: email,
                 subject: lang === 'en' ? 'Have you forgotten your password?' : 'Zapomniałeś hasła?',
-                html: lang === 'en' ? resetPasswordEmailTemplateEng(locals) : resetPasswordEmailTemplate(locals) 
+                html: lang === 'en' ? resetPasswordEmailTemplateEng(locals) : resetPasswordEmailTemplate(locals)
             };
-          };
-        
+        };
+
         const kod = results[0][0].kod;
         const uzytkownik_uuid = results[1][0].uzytkownik_uuid;
-          
+
         let blad = false;
         const result = await Nodemailer.default.getTransporter().sendMail(
             options(email, {
@@ -379,9 +379,9 @@ router.post('/remind', (req, res, next) => {
             return;
         });
 
-        if(blad) return;
+        if (blad) return;
 
-        Success.OK(res, {pIsSucces: 1});
+        Success.OK(res, { pIsSucces: 1 });
     });
 });
 
@@ -391,15 +391,15 @@ router.post('/reset-password', (req, res, next) => {
     const kod = Number(body?.kod);
     const haslo = body?.haslo;
     try {
-        POTWIERDZENIA.validator({kod: kod})
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, haslo: haslo});
+        POTWIERDZENIA.validator({ kod: kod })
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, haslo: haslo });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
-    
-    db.query("CALL `UZYTKOWNICY_nadajNoweHaslo(*)`(?,?,?);", [uzytkownik_uuid,kod,auth.hashPassword(haslo).toString()], async (err, results, fields) => {
-        
+
+    db.query("CALL `UZYTKOWNICY_nadajNoweHaslo(*)`(?,?,?);", [uzytkownik_uuid, kod, auth.hashPassword(haslo).toString()], async (err, results, fields) => {
+
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -408,7 +408,7 @@ router.post('/reset-password', (req, res, next) => {
             return;
         }
 
-        Success.OK(res, {pIsSucces: 1});
+        Success.OK(res, { pIsSucces: 1 });
     });
 });
 
@@ -417,8 +417,8 @@ router.get('/confirmCode/:uzytkownik_uuid/:kod/:czy_na_telefon', (req, res, next
     const kod = Number(req.params?.kod);
     const czy_na_telefon = Number(req.params?.czy_na_telefon);
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-        POTWIERDZENIA.validator({kod: kod, czy_na_telefon: czy_na_telefon});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
+        POTWIERDZENIA.validator({ kod: kod, czy_na_telefon: czy_na_telefon });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -442,7 +442,7 @@ router.post('/loginUser', (req, res, next) => {
     const haslo = body?.haslo;
 
     try {
-        UZYTKOWNICY.validator({email: email, haslo: haslo});
+        UZYTKOWNICY.validator({ email: email, haslo: haslo });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -458,15 +458,15 @@ router.post('/loginUser', (req, res, next) => {
             return;
         }
 
-        if(results.length === 2 && results[0][0].pIsSucces == "0") {
+        if (results.length === 2 && results[0][0].pIsSucces == "0") {
             ClientError.unauthorized(res, "The given data is incorrect");
             return;
         }
 
         const user = results[0][0];
-        
-        
-        Success.OK(res, {...user, token: JWT.default.createToken(user.uzytkownik_id, user.uzytkownik_uuid, user.uzytkownik_typ)});
+
+
+        Success.OK(res, { ...user, token: JWT.default.createToken(user.uzytkownik_id, user.uzytkownik_uuid, user.uzytkownik_typ) });
     });
 });
 
@@ -474,13 +474,13 @@ router.get('/getFight/:walka_id', (req, res, next) => {
 
     const walka_id = Number(req.params?.walka_id);
     try {
-        WALKI.validator({walka_id: walka_id});
+        WALKI.validator({ walka_id: walka_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    WALKI_pobierzWalke(res,walka_id).catch(() => {
+    WALKI_pobierzWalke(res, walka_id).catch(() => {
         return;
     }).then((result) => {
         Success.OK(res, result as object);
@@ -507,7 +507,7 @@ router.get('/getAllFightsForGroup/:grupa_id', (req, res, next) => {
 
     const grupa_id = Number(req.params?.grupa_id);
     try {
-        GRUPY_WALK.validator({grupa_id: grupa_id});
+        GRUPY_WALK.validator({ grupa_id: grupa_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -531,7 +531,7 @@ router.get('/getAllFightsForCategory/:kategoria_id', (req, res, next) => {
 
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -555,7 +555,7 @@ router.get('/getAllFightsForRobot/:robot_uuid', (req, res, next) => {
 
     const robot_uuid = req.params?.robot_uuid;
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -579,7 +579,7 @@ router.get('/getAllFightsForPosiotion/:stanowisko_id', (req, res, next) => {
 
     const stanowisko_id = Number(req.params?.stanowisko_id);
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id});
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -603,7 +603,7 @@ router.get('/getWinnersForGroup/:grupa_id', (req, res, next) => {
 
     const grupa_id = Number(req.params?.grupa_id);
     try {
-        GRUPY_WALK.validator({grupa_id: grupa_id});
+        GRUPY_WALK.validator({ grupa_id: grupa_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -626,7 +626,7 @@ router.get('/getWinnersForCategory/:kategoria_id', (req, res, next) => {
 
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -648,7 +648,7 @@ router.get('/getWinnersForCategory/:kategoria_id', (req, res, next) => {
 
 router.get('/getBestTimes', (req, res, next) => {
 
-    db.query("CALL `WYNIKI_CZASOWE_pobierzNajlepszeWyniki(*)`();",  (err, results, fields) => {
+    db.query("CALL `WYNIKI_CZASOWE_pobierzNajlepszeWyniki(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -664,7 +664,7 @@ router.get('/getBestTimes', (req, res, next) => {
 
 router.get('/getAllTimes', (req, res, next) => {
 
-    db.query("CALL `WYNIKI_CZASOWE_pobierzWszystkieWyniki(*)`();",  (err, results, fields) => {
+    db.query("CALL `WYNIKI_CZASOWE_pobierzWszystkieWyniki(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -682,7 +682,7 @@ router.get('/getAllTimesForCategory/:kategoria_id', (req, res, next) => {
 
     const kategoria_id = Number(req.params?.kategoria_id);
     try {
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -706,7 +706,7 @@ router.get('/getAllTimesForRobot/:robot_uuid', (req, res, next) => {
 
     const robot_uuid = req.params?.robot_uuid;
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -730,7 +730,7 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
 
     const stanowisko_id = Number(req.params?.stanowisko_id);
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id});
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -751,15 +751,31 @@ router.get('/getAllTimesForPosiotion/:stanowisko_id', (req, res, next) => {
 });
 
 router.get('/currentVisitors', (req, res, next) => {
-    
+
     let current = visitor_counter.getIleOsobNaWydarzeniu();
-    Success.OK(res, {currentVisitors: current})
-    
+    Success.OK(res, { currentVisitors: current })
+
 });
 
 router.get('/getAnnouncements', (req, res, next) => {
 
     db.query("CALL `WIADOMOSCI_pobierzOgloszenia(*)`();", (err, results, fields) => {
+
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, results[0]);
+    });
+});
+
+router.get('/getTimetables', (req, res, next) => {
+
+    db.query("CALL `HARMONOGRAM_pobierzHarmonogramy(*)`();", (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);

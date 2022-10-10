@@ -16,6 +16,7 @@ import * as referee from '../routes/referee';
 import * as publicRoutes from '../routes/public';
 import { KATEGORIE_STANOWISKA } from '../models/database/KATEGORIE_STANOWISKA';
 import sms from '../utils/sms';
+import { HARMONOGRAM } from '../models/database/HARMONOGRAM';
 
 
 
@@ -100,9 +101,9 @@ function WALKI_dodajWalke(res: express.Response, stanowisko_id: number, nastepna
 function WALKI_dodajWalkeOrazRoboty(res: express.Response, stanowisko_id: number, grupa_id: number, robot1_uuid: string, robot2_uuid: string): Promise<object> {
     return new Promise<object>((resolve, reject) => {
         try {
-            WALKI.validator({ stanowisko_id: stanowisko_id, grupa_id: grupa_id});
-            ROBOTY.validator({robot_uuid: robot1_uuid})
-            ROBOTY.validator({robot_uuid: robot2_uuid})
+            WALKI.validator({ stanowisko_id: stanowisko_id, grupa_id: grupa_id });
+            ROBOTY.validator({ robot_uuid: robot1_uuid })
+            ROBOTY.validator({ robot_uuid: robot2_uuid })
         } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
@@ -118,7 +119,7 @@ function WALKI_dodajWalkeOrazRoboty(res: express.Response, stanowisko_id: number
                 reject();
                 return;
             }
-        
+
             const walka = results[results.length - 2][0];
             socketIO.default.getIO().emit("addFightAndRobots", walka);
             resolve(walka);
@@ -186,7 +187,7 @@ router.put('/addRobotRejection', (req, res, next) => {
     const powod_odrzucenia = body?.powod_odrzucenia;
 
     try {
-        ROBOTY.validator({ robot_uuid: robot_uuid, powod_odrzucenia: powod_odrzucenia});
+        ROBOTY.validator({ robot_uuid: robot_uuid, powod_odrzucenia: powod_odrzucenia });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -213,7 +214,7 @@ router.put('/changeUserType', (req, res, next) => {
     const uzytkownik_typ = Number(body?.uzytkownik_typ);
 
     try {
-        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, uzytkownik_typ: uzytkownik_typ});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, uzytkownik_typ: uzytkownik_typ });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -367,7 +368,7 @@ router.post('/addPosition', (req, res, next) => {
     const nazwa = body?.nazwa;
 
     try {
-        STANOWISKA.validator({nazwa: nazwa})
+        STANOWISKA.validator({ nazwa: nazwa })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -381,7 +382,7 @@ router.post('/addPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowisko_id: results[0][0].stanowisko_id,
             nazwa_stanowiska: nazwa,
             kategorie: null,
@@ -398,13 +399,13 @@ router.put('/editPosition', (req, res, next) => {
     const nazwa = body?.nazwa;
 
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id,nazwa: nazwa})
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id, nazwa: nazwa })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `STANOWISKA_edytujStanowisko(A)`(?,?);", [stanowisko_id,nazwa], (err, results, fields) => {
+    db.query("CALL `STANOWISKA_edytujStanowisko(A)`(?,?);", [stanowisko_id, nazwa], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -412,7 +413,7 @@ router.put('/editPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowisko_id: stanowisko_id,
             nazwa_stanowiska: nazwa
         };
@@ -426,7 +427,7 @@ router.delete('/removePosition', (req, res, next) => {
     const stanowisko_id = Number(body?.stanowisko_id);
 
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id})
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -440,7 +441,7 @@ router.delete('/removePosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowisko_id: stanowisko_id,
         };
         Success.OK(res, response);
@@ -455,14 +456,14 @@ router.post('/addRefereeToPosition', (req, res, next) => {
     const uzytkownik_uuid = body?.uzytkownik_uuid;
 
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id})
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid})
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id })
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `STANOWISKA_SEDZIOWIE_dodajSedziegoDoStanowiska(A)`(?,?);", [uzytkownik_uuid,stanowisko_id], (err, results, fields) => {
+    db.query("CALL `STANOWISKA_SEDZIOWIE_dodajSedziegoDoStanowiska(A)`(?,?);", [uzytkownik_uuid, stanowisko_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -470,7 +471,7 @@ router.post('/addRefereeToPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowiska_sedziowie_id: results[0][0].stanowiska_sedziowie_id,
             stanowisko_id: stanowisko_id,
             uzytkownik_uuid: uzytkownik_uuid
@@ -486,14 +487,14 @@ router.delete('/removeRefereeFromPosition', (req, res, next) => {
     const uzytkownik_uuid = body?.uzytkownik_uuid;
 
     try {
-        STANOWISKA.validator({stanowisko_id: stanowisko_id})
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid})
+        STANOWISKA.validator({ stanowisko_id: stanowisko_id })
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `STANOWISKA_SEDZIOWIE_usunSedziegoZeStanowiska(A)`(?,?);", [uzytkownik_uuid,stanowisko_id], (err, results, fields) => {
+    db.query("CALL `STANOWISKA_SEDZIOWIE_usunSedziegoZeStanowiska(A)`(?,?);", [uzytkownik_uuid, stanowisko_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -501,7 +502,7 @@ router.delete('/removeRefereeFromPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowisko_id: stanowisko_id,
             uzytkownik_uuid: uzytkownik_uuid
         };
@@ -516,13 +517,13 @@ router.post('/addCategoryToPosition', (req, res, next) => {
     const kategoria_id = Number(body?.kategoria_id);
 
     try {
-        KATEGORIE_STANOWISKA.validator({stanowisko_id: stanowisko_id, kategoria_id: kategoria_id})
+        KATEGORIE_STANOWISKA.validator({ stanowisko_id: stanowisko_id, kategoria_id: kategoria_id })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `KATEGORIE_STANOWISKA_dodajKategorieStanowiska(A)`(?,?);", [stanowisko_id,kategoria_id], (err, results, fields) => {
+    db.query("CALL `KATEGORIE_STANOWISKA_dodajKategorieStanowiska(A)`(?,?);", [stanowisko_id, kategoria_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -530,7 +531,7 @@ router.post('/addCategoryToPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowiska_sedziowie_id: results[0][0].kategorie_stanowiska_id,
             stanowisko_id: stanowisko_id,
             kategoria_id: kategoria_id
@@ -546,13 +547,13 @@ router.delete('/removeCategoryFromPosition', (req, res, next) => {
     const kategoria_id = Number(body?.kategoria_id);
 
     try {
-        KATEGORIE_STANOWISKA.validator({stanowisko_id: stanowisko_id, kategoria_id: kategoria_id})
+        KATEGORIE_STANOWISKA.validator({ stanowisko_id: stanowisko_id, kategoria_id: kategoria_id })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `KATEGORIE_STANOWISKA_usunKategorieStanowiska(A)`(?,?);", [stanowisko_id,kategoria_id], (err, results, fields) => {
+    db.query("CALL `KATEGORIE_STANOWISKA_usunKategorieStanowiska(A)`(?,?);", [stanowisko_id, kategoria_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -560,7 +561,7 @@ router.delete('/removeCategoryFromPosition', (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        const response =  {
+        const response = {
             stanowisko_id: stanowisko_id,
             kategoria_id: kategoria_id
         };
@@ -574,7 +575,7 @@ router.post('/sendMessageToAllUsers', (req, res, next) => {
     const tresc = body?.tresc;
 
     try {
-        WIADOMOSCI.validator({tresc: tresc});
+        WIADOMOSCI.validator({ tresc: tresc });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -589,9 +590,9 @@ router.post('/sendMessageToAllUsers', (req, res, next) => {
             return;
         }
 
-        
+
         let numery = results[0];
-        
+
         let response = {
             sendedCount: numery.length,
             tresc: tresc,
@@ -599,16 +600,92 @@ router.post('/sendMessageToAllUsers', (req, res, next) => {
             uzytkownik_id: null,
             czas_nadania: new Date()
         }
-        db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [null, tresc], (err, results, fields) => {       
-            response['wiadomosc_id']=results[0].wiadomosc_id;
+        db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [null, tresc], (err, results, fields) => {
+            response['wiadomosc_id'] = results[0].wiadomosc_id;
             for (let i = 0; i < numery.length; i++) {
-                sms.sendSms(numery[i].numer_telefonu, tresc)            
+                sms.sendSms(numery[i].numer_telefonu, tresc)
             }
         })
 
         socketIO.default.getIO().emit("sendMessageToAllUsers", response);
 
-        Success.OK(res,response);
+        Success.OK(res, response);
+    });
+});
+
+router.post('/addNewTimetable', (req, res, next) => {
+
+    const body = req?.body;
+    const nazwa = body?.nazwa;
+    const godzina_rozpoczecia = new Date(body?.godzina_rozpoczecia);
+    const interwal = Number(body?.interwal);
+    const wiersze = Number(body?.wiersze);
+    const kolumny = Number(body?.kolumny);
+
+    try {
+        HARMONOGRAM.validator({ nazwa: nazwa, godzina_rozpoczecia: godzina_rozpoczecia, interwal: interwal, wiersze: wiersze, kolumny: kolumny })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `HARMONOGRAM_dodajNowy(A)`(?,?,?,?,?);", [nazwa, godzina_rozpoczecia, interwal, kolumny, wiersze], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            harmonogram_id: results[0][0].harmonogram_id,
+            nazwa: nazwa,
+            godzina_rozpoczecia: godzina_rozpoczecia.toISOString(),
+            interwal: interwal,
+            wiersze: wiersze,
+            kolumny: kolumny,
+            komorki: null
+        }
+
+
+        socketIO.default.getIO().emit("addNewTimetable", response);
+
+        Success.OK(res, response);
+    });
+});
+
+router.put('/editTimetable', (req, res, next) => {
+
+    const body = req?.body;
+    const harmonogram_id = Number(body?.harmonogram_id);
+    const komorki = body?.komorki;
+
+    try {
+        HARMONOGRAM.validator({ harmonogram_id: harmonogram_id, komorki: komorki })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `HARMONOGRAM_aktualizujKomorki(A)`(?,?);", [harmonogram_id, komorki], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            harmonogram_id: harmonogram_id,
+            komorki: komorki
+        }
+
+
+        socketIO.default.getIO().emit("editTimetable", response);
+
+        Success.OK(res, response);
     });
 });
 
@@ -653,9 +730,9 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         return;
     });
 
-    
+
     if (blad) return;
-    
+
     // sprawdzenie stanowiska pod względem kategorii
     for (let index = 0; index < stanowiskaLista.length; index++) {
         const stanowiskoId = stanowiskaLista[index];
@@ -666,7 +743,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             ClientError.notAcceptable(res, err.message);
             break;
         }
-        
+
         const czyMa = (await referee.STANOWISKA_czyStanowiskoMaKategorie(res, stanowiskoId, kategoria_id) as any).pCzyMa;
         if (czyMa !== 1) {
             blad = true;
@@ -674,11 +751,11 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             break;
         }
     }
-    
-    
+
+
     if (blad) return;
-    
-    
+
+
     //pobranie robotow do ustawienia
     let roboty = await new Promise<Array<any>>((resolve, reject) => {
         db.query(`SELECT DISTINCT robot_uuid FROM ROBOTY
@@ -699,7 +776,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             }));
         });
     })
-    
+
     //sprawdzenie czy ilość stanowisk <= ilość do finalu <= ilość robotów
     if (stanowiskaLista.length > iloscDoFinalu) {
         ClientError.badRequest(res, `Ilość do finału jest mniejsza niż ilość stanowisk (${iloscDoFinalu} - ilość do finału < ${stanowiskaLista.length} - stanowiska)`)
@@ -709,8 +786,8 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         ClientError.badRequest(res, `Ilość robotów jest mniejsza niż ilość do finału (${roboty.length} - roboty < ${iloscDoFinalu} - ilość do finału)`)
         return;
     }
-    const pog = roboty.length/stanowiskaLista.length;
-    if ( pog < 3 && opcjaTworzenia != 1 ) {
+    const pog = roboty.length / stanowiskaLista.length;
+    if (pog < 3 && opcjaTworzenia != 1) {
         ClientError.badRequest(res, `Ilość robotów w grupie elimiacyjnej jest zbyt mała (${pog.toPrecision(1)} - w grupie, ${roboty.length} - ogółem). Zmniejsz liczbę stanowisk (grup) lub przełącz tryb tworzenia na 'tylko finał'.`)
         return;
     }
@@ -718,7 +795,7 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
     //     ClientError.badRequest(res, `Ilość robotów jest zbyt mała aby eliminacje miały sens (${roboty.length} - roboty, ${iloscDoFinalu} - ilość do finału). Zmniejsz ilość do finału.`)
     //     return;
     // }
-    
+
     //sprawdzenie czy ilosc do finalu, ilosc stanowisk 2^n
     if (iloscDoFinalu !== 1 && iloscDoFinalu !== 2 && iloscDoFinalu !== 4 && iloscDoFinalu !== 8 && iloscDoFinalu !== 16 && iloscDoFinalu !== 32 && iloscDoFinalu !== 64 && iloscDoFinalu !== 128) {
         ClientError.badRequest(res, 'Ilość do finału nie jest równa 2^n')
@@ -728,8 +805,8 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
         ClientError.badRequest(res, 'Ilość stanowisk nie jest równa 2^n')
         return;
     }
-    
-    
+
+
     const kategoria_nazwa = await new Promise<string>((resolve, reject) => {
         db.query(`SELECT KATEGORIE.nazwa FROM KATEGORIE WHERE KATEGORIE.kategoria_id = ?`, [kategoria_id], (err, results, fields) => {
             if (err?.sqlState === '45000') {
@@ -744,9 +821,9 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             resolve((results[0] as any).nazwa);
         });
     })
-    
-    if(opcjaTworzenia == null || opcjaTworzenia == 1) {
-        
+
+    if (opcjaTworzenia == null || opcjaTworzenia == 1) {
+
         //DRZEWKO FINAŁU
         //utwórz grupe finałową
         if (iloscDoFinalu !== 1) {
@@ -754,21 +831,21 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             //rozpocznij od walki szczytowej, zejdź do podstawy gdzie ilość walk/2 = ilosć do finału
             const iloscWalk = iloscDoFinalu / 2;
             const maxDeep = Math.log2(iloscWalk) - 1;
-            
+
             //rozłóż stanowiska tak, aby rozłożyć walki równomiernie na każde z nich
             let stanowiska = [...stanowiskaLista].sort((a, b) => a + b);
-            
+
             if (stanowiska.length < iloscWalk) {
                 for (let i = 0; i < (iloscWalk / stanowiska.length); i++) {
                     stanowiska = stanowiska.concat(stanowiska);
                 }
-            }            
+            }
             const maxDeepStanowiska = Math.log2(iloscWalk) - 1;
             const initial_length = iloscWalk * 2 - 1;
             let actual_length = initial_length;
             let offset = 0;
             let do_wybrania = new Array(initial_length).fill(stanowiskaLista.length > 1 ? 0 : stanowiskaLista[0]);
-            if(stanowiskaLista.length > 0) {
+            if (stanowiskaLista.length > 0) {
                 for (let i = 0; i <= (maxDeepStanowiska + 1); i++) {
                     let pula = [...stanowiska];
                     if (i == maxDeepStanowiska + 1) {
@@ -788,45 +865,45 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
                         offset += 1;
                     }
                 }
-                
-            } 
-            
+
+            }
+
             do_wybrania = do_wybrania.reverse();
             let walkao3miejsce = (await WALKI_dodajWalke(res, do_wybrania[0] as number, 0, grupaFinalowaId) as any).walka_id as number;
             let topWalkaId = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, 0, grupaFinalowaId) as any).walka_id as number;
             let stosWalk: Array<WalkaNaStosie> = [{ poziom: 0, walka_id: topWalkaId }, { poziom: 0, walka_id: topWalkaId }];
             while (stosWalk.length !== 0 && do_wybrania.length !== 0) {
-                try {                    
+                try {
                     let nadrzednaWalka = stosWalk.pop() as WalkaNaStosie;
                     let nastepnaWalka = (await WALKI_dodajWalke(res, do_wybrania.pop() as number, nadrzednaWalka.walka_id, grupaFinalowaId) as any).walka_id;
                     if (nadrzednaWalka.poziom < maxDeep) {
                         stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
                         stosWalk.push({ poziom: nadrzednaWalka.poziom + 1, walka_id: nastepnaWalka })
                     }
-                } catch (error) {  
+                } catch (error) {
                 }
-                
+
             }
-            wiadomoscZwrotna += `Utworzono drzewko finałowe dla ${iloscDoFinalu} robotów, składające się z ${iloscWalk} walk rozłożonych przez ${maxDeep+1} szczeble. `
+            wiadomoscZwrotna += `Utworzono drzewko finałowe dla ${iloscDoFinalu} robotów, składające się z ${iloscWalk} walk rozłożonych przez ${maxDeep + 1} szczeble. `
         }
     }
 
-    if(opcjaTworzenia == null || opcjaTworzenia == 0) {
+    if (opcjaTworzenia == null || opcjaTworzenia == 0) {
 
         //ELIMINACJE
         //wymieszaj roboty
-        var currentIndex = roboty.length,  randomIndex;
+        var currentIndex = roboty.length, randomIndex;
         while (currentIndex != 0) {
             randomIndex = Math.floor(Math.random() * currentIndex);
             currentIndex--;
             [roboty[currentIndex], roboty[randomIndex]] = [roboty[randomIndex], roboty[currentIndex]];
         }
-    
+
         //podziel roboty na grupy (losowo), ilością równe ilości stanowisk
         const iloscGrup = stanowiskaLista.length;
         let nowa: Array<Array<string>> = Array.from(Array(iloscGrup), () => []);
         for (let j = 0; j < roboty.length; j++) {
-            nowa[j%iloscGrup].push(roboty[j])
+            nowa[j % iloscGrup].push(roboty[j])
         }
         const liczbaRobotow = roboty.length;
         roboty = nowa;
@@ -836,29 +913,29 @@ router.post('/createGroupsFromCategory', async (req, res, next) => {
             const nazwa = `ELIMINACJE gr. ${nazwyGrup[index]} - ${kategoria_nazwa}`;
             const robotyWGrupie = roboty[index] as Array<string>;
             try {
-                GRUPY_WALK.validator({nazwa: nazwa})
+                GRUPY_WALK.validator({ nazwa: nazwa })
             } catch (err: any) {
                 blad = true;
                 ClientError.notAcceptable(res, err.message);
                 break;
             }
-    
+
             const grupaEliminacyjnaId = (await GRUPY_WALK_dodajGrupe(res, nazwa, kategoria_id) as any).grupa_id;
-    
+
             //w każdej grupie ustaw roboty, przeciwko sobie
             for (let x = 0; x < robotyWGrupie.length; x++) {
-                for(let c = x + 1; c < robotyWGrupie.length; c++) {
+                for (let c = x + 1; c < robotyWGrupie.length; c++) {
                     await WALKI_dodajWalkeOrazRoboty(res, stanowiskaLista[index], grupaEliminacyjnaId, robotyWGrupie[x], robotyWGrupie[c]).catch(() => {
                         blad = true;
                         return;
                     });
-                    if(blad) break;
+                    if (blad) break;
                 }
             }
         }
 
-        wiadomoscZwrotna += (`Utworzono ${iloscGrup} grup eliminacyjncyh o liczności ${(liczbaRobotow/iloscGrup)%1 > 0 ? (Math.floor((liczbaRobotow/iloscGrup)) + '-'
-        + (Math.floor((liczbaRobotow/iloscGrup))+1))  : (liczbaRobotow/iloscGrup)} robotów, z których każdej wyłoni się ${iloscDoFinalu/iloscGrup} finalistów.`)
+        wiadomoscZwrotna += (`Utworzono ${iloscGrup} grup eliminacyjncyh o liczności ${(liczbaRobotow / iloscGrup) % 1 > 0 ? (Math.floor((liczbaRobotow / iloscGrup)) + '-'
+            + (Math.floor((liczbaRobotow / iloscGrup)) + 1)) : (liczbaRobotow / iloscGrup)} robotów, z których każdej wyłoni się ${iloscDoFinalu / iloscGrup} finalistów.`)
 
     }
 
