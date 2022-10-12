@@ -689,6 +689,38 @@ router.put('/editTimetable', (req, res, next) => {
     });
 });
 
+router.delete('/deleteTimetable', (req, res, next) => {
+
+    const body = req?.body;
+    const harmonogram_id = Number(body?.harmonogram_id);
+
+    try {
+        HARMONOGRAM.validator({ harmonogram_id: harmonogram_id })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `HARMONOGRAM_usunHarmonogram(A)`(?);", [harmonogram_id], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            harmonogram_id: harmonogram_id,
+        }
+
+
+        socketIO.default.getIO().emit("deleteTimetable", response);
+
+        Success.OK(res, response);
+    });
+});
+
 interface WalkaNaStosie {
     poziom: number;
     walka_id: number;
