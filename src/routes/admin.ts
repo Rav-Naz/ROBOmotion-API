@@ -151,6 +151,36 @@ router.post('/addGroup', (req, res, next) => {
     });
 });
 
+router.put('/editName', (req, res, next) => {
+
+    const body = req?.body;
+    const grupa_id = body?.grupa_id;
+    const nazwa = body?.nazwa;
+
+    try {
+        GRUPY_WALK.validator({ grupa_id: grupa_id, nazwa: nazwa })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `GRUPY_WALK_zmienNazwe(A)`(?,?);", [grupa_id, nazwa], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            grupa_id: grupa_id,
+            nazwa: nazwa
+        }
+        socketIO.default.getIO().emit("editGroup", response);
+        Success.OK(res, response);
+    });
+});
+
 router.post('/deleteGroup', (req, res, next) => {
 
     const body = req?.body;
