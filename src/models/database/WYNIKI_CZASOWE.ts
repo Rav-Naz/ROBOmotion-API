@@ -1,4 +1,4 @@
-export class WYNIKI_CZASOWE{
+export class WYNIKI_CZASOWE {
 
     wynik_id?: number | undefined;
     robot_id?: number | undefined;
@@ -6,9 +6,10 @@ export class WYNIKI_CZASOWE{
     czas_zakonczenia?: Date | undefined;
     stanowisko_id?: number | undefined;
     kategoria_id?: number | undefined;
+    uwagi?: string | null | undefined;
 
 
-    static validator(body: WYNIKI_CZASOWE = {wynik_id: undefined, czas_przejazdu: undefined, kategoria_id: undefined, czas_zakonczenia: undefined, robot_id: undefined, stanowisko_id: undefined}): void  {
+    static validator(body: WYNIKI_CZASOWE = { wynik_id: undefined, czas_przejazdu: undefined, kategoria_id: undefined, czas_zakonczenia: undefined, robot_id: undefined, stanowisko_id: undefined }): void {
         if ((typeof body.wynik_id !== "number" || body.wynik_id.toString().length > 7 || isNaN(body.wynik_id)) && typeof body.wynik_id !== "undefined") {
             throw new Error('WYNIKI_CZASOWE.wynik_id is not valid');
         }
@@ -26,6 +27,9 @@ export class WYNIKI_CZASOWE{
         }
         if ((typeof body.kategoria_id !== "number" || body.kategoria_id.toString().length > 3 || isNaN(body.kategoria_id)) && typeof body.kategoria_id !== "undefined") {
             throw new Error('WYNIKI_CZASOWE.kategoria_id is not valid');
+        }
+        if ((typeof body.uwagi !== "string" || body.uwagi.length > 500) && typeof body.uwagi !== "undefined" && typeof body.uwagi !== "object") {
+            throw new Error('WYNIKI_CZASOWE.uwagi is not valid');
         }
     }
 }

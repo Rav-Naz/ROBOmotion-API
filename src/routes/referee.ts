@@ -81,7 +81,7 @@ router.get('/checkIfPositionHasCategory/:stanowisko_id/:kategoria_id', (req, res
         return;
     }
 
-    STANOWISKA_czyStanowiskoMaKategorie(res,stanowisko_id,kategoria_id).catch(() => {
+    STANOWISKA_czyStanowiskoMaKategorie(res, stanowisko_id, kategoria_id).catch(() => {
         return;
     }).then((result) => {
         Success.OK(res, result as object);
@@ -99,7 +99,7 @@ router.get('/getRefereePositions/:uzytkownik_uuid', (req, res, next) => {
         return;
     }
 
-    db.query("CALL `UZYTKOWNICY_pobierzStanowiskaSedziego(S)`(?);",  [uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_pobierzStanowiskaSedziego(S)`(?);", [uzytkownik_uuid], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -138,15 +138,15 @@ router.get('/getUserContactDetails/:uzytkownik_uuid', (req, res, next) => {
 router.get('/getUsers', (req, res, next) => {
 
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
-    
+
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `UZYTKOWNICY_pobierzUzytkownikow(S)`(?);",  [uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_pobierzUzytkownikow(S)`(?);", [uzytkownik_uuid], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -164,16 +164,16 @@ router.get('/getRobotsOfUserInCategory/:uzytkownik_uuid/:kategoria_id', (req, re
 
     const uzytkownik_uuid = req.params?.uzytkownik_uuid;
     const kategoria_id = Number(req.params?.kategoria_id);
-    
+
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktoraWKategorii(S)`(?,?);",  [uzytkownik_uuid, kategoria_id], (err, results, fields) => {
+    db.query("CALL `KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktoraWKategorii(S)`(?,?);", [uzytkownik_uuid, kategoria_id], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -196,13 +196,13 @@ router.post('/setFightResult', (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        WALKI.validator({wygrane_rundy_robot1: wygrane_rundy_robot1, wygrane_rundy_robot2: wygrane_rundy_robot2, walka_id: walka_id});
+        WALKI.validator({ wygrane_rundy_robot1: wygrane_rundy_robot1, wygrane_rundy_robot2: wygrane_rundy_robot2, walka_id: walka_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `WALKI_ustalWynikWalki(S)`(?,?,?,@p2,?);",  [walka_id, wygrane_rundy_robot1, wygrane_rundy_robot2,uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `WALKI_ustalWynikWalki(S)`(?,?,?,@p2,?);", [walka_id, wygrane_rundy_robot1, wygrane_rundy_robot2, uzytkownik_uuid], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -225,7 +225,7 @@ router.post('/setFightResult', (req, res, next) => {
         socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("robots/setFightResult", walka);
         // socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("robots/setFightResult", nastepna_walka);
         socketIO.default.getIO().emit("setFightResult", walka);
-        if(results[2]) {
+        if (results[2]) {
             socketIO.default.getIO().emit("addRobotToFight", results[2][0]);
         }
         Success.OK(res, walka);
@@ -239,8 +239,8 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
     const tresc = body?.tresc;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        WIADOMOSCI.validator({tresc: tresc});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        WIADOMOSCI.validator({ tresc: tresc });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -255,11 +255,11 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
             return;
         }
 
-        
+
         let numery = results[0];
         for (let i = 0; i < numery.length; i++) {
             db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [numery[i].uzytkownik_uuid, tresc], (err, results, fields) => {
-                sms.sendSms(numery[i].numer_telefonu,tresc)            
+                sms.sendSms(numery[i].numer_telefonu, tresc)
             })
         }
 
@@ -267,7 +267,7 @@ router.post('/sendMessageToAllConstructorsOfRobot', (req, res, next) => {
             sendedCount: numery.length
         }
 
-        Success.OK(res,response);
+        Success.OK(res, response);
     });
 });
 
@@ -277,7 +277,7 @@ router.put('/confirmStarterpackGiven', (req, res, next) => {
     const uzytkownik_uuid = body?.uzytkownik_uuid;
 
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -334,16 +334,16 @@ router.post('/setTimeResult', (req, res, next) => {
     const stanowisko_id = Number(body?.stanowisko_id);
     const kategoria_id = Number(body?.kategoria_id);
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
-
+    const uwagi = body?.uwagi;
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        WYNIKI_CZASOWE.validator({czas_przejazdu: czas_przejazdu, kategoria_id: kategoria_id, stanowisko_id: stanowisko_id})
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        WYNIKI_CZASOWE.validator({ czas_przejazdu: czas_przejazdu, kategoria_id: kategoria_id, stanowisko_id: stanowisko_id, uwagi: uwagi })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `WYNIKI_CZASOWE_dodajWynik(S)`(?,?,?,?,?);",  [robot_uuid, czas_przejazdu, stanowisko_id, kategoria_id, uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `WYNIKI_CZASOWE_dodajWynik(S)`(?,?,?,?,?,?);", [robot_uuid, czas_przejazdu, stanowisko_id, kategoria_id, uzytkownik_uuid, uwagi], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -362,7 +362,8 @@ router.post('/setTimeResult', (req, res, next) => {
             robot_uuid: robot_uuid,
             czas_przejazdu: czas_przejazdu,
             stanowisko_id: stanowisko_id,
-            kategoria_id: kategoria_id
+            kategoria_id: kategoria_id,
+            uwagi: uwagi
         }
 
         socketIO.default.getIO().to(`robots/${robot_uuid}`).emit("robots/setTimeResult", wynik);
@@ -377,15 +378,16 @@ router.put('/updateTimeResult', (req, res, next) => {
     const wynik_id = Number(body?.wynik_id);
     const czas_przejazdu = Number(body?.czas_przejazdu);
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    const uwagi = body?.uwagi;
 
     try {
-        WYNIKI_CZASOWE.validator({czas_przejazdu: czas_przejazdu, wynik_id: wynik_id})
+        WYNIKI_CZASOWE.validator({ czas_przejazdu: czas_przejazdu, wynik_id: wynik_id, uwagi: uwagi })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `WYNIKI_CZASOWE_edytujWynik(S)`(?,?,@p2,?);",  [wynik_id, czas_przejazdu, uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `WYNIKI_CZASOWE_edytujWynik(S)`(?,?,@p2,?,?);", [wynik_id, czas_przejazdu, uzytkownik_uuid, uwagi], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -398,7 +400,8 @@ router.put('/updateTimeResult', (req, res, next) => {
             wynik_id: wynik_id,
             robot_uuid: results[0][0].robot_uuid,
             czas_przejazdu: czas_przejazdu,
-            isSucces: results[0][0].pIsSucces
+            isSucces: results[0][0].pIsSucces,
+            uwagi: uwagi
         }
 
         socketIO.default.getIO().to(`robots/${wynik.robot_uuid}`).emit("robots/updateTimeResult", wynik);
@@ -442,7 +445,7 @@ router.put('/activateGroup', (req, res, next) => {
     const grupa_id = body?.grupa_id;
 
     try {
-        GRUPY_WALK.validator({grupa_id: grupa_id})
+        GRUPY_WALK.validator({ grupa_id: grupa_id })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -471,7 +474,7 @@ router.put('/deactivateGroup', (req, res, next) => {
     const grupa_id = body?.grupa_id;
 
     try {
-        GRUPY_WALK.validator({grupa_id: grupa_id})
+        GRUPY_WALK.validator({ grupa_id: grupa_id })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -522,7 +525,7 @@ router.post('/sendPrivateMessage', (req, res, next) => {
             uzytkownik_uuid: uzytkownik_uuid,
             tresc: tresc
         }
-        if(numer_telefonu != null) {
+        if (numer_telefonu != null) {
             db.query("CALL `WIADOMOSCI_wyslijWiadomosc(A)`(?,?);", [uzytkownik_uuid, tresc], (err, results, fields) => {
                 sms.sendSms(numer_telefonu, tresc);
             })
