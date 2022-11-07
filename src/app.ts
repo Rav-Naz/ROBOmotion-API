@@ -84,7 +84,7 @@ const server = httpServer.listen(port, hostName, async () => {
             var nazwa = String(element.nazwa);
             var data_rozpoczecia = new Date(element.data_rozpoczecia);
             var data_zakonczenia = new Date(element.data_zakonczenia);
-            time_constraints.default.addToTimeConstraints({nazwa, data_rozpoczecia, data_zakonczenia});
+            time_constraints.default.addToTimeConstraints({ nazwa, data_rozpoczecia, data_zakonczenia });
         });
     });
     db.query("SELECT * FROM `JEDZENIE`", [], (err, results, fields) => {
@@ -94,7 +94,7 @@ const server = httpServer.listen(port, hostName, async () => {
 
         results.forEach((element: any) => {
             try {
-                JEDZENIE.validator({nazwa:element.nazwa});
+                JEDZENIE.validator({ nazwa: element.nazwa });
             } catch (err: any) {
                 console.log(err)
                 return;
@@ -108,19 +108,20 @@ const server = httpServer.listen(port, hostName, async () => {
         }
         results.forEach((element: any) => {
             try {
-                ROZMIAR_KOSZULKI.validator({rozmiar:element.rozmiar});
+                ROZMIAR_KOSZULKI.validator({ rozmiar: element.rozmiar });
             } catch (err: any) {
                 console.log(err)
                 return;
             }
             register_addons.default.addRozmiarKoszulki(element.rozmiar);
-        });    });
+        });
+    });
     db.query("CALL `ILE_OSOB_NA_WYDARZENIU_ileOsob(D)`();", (err, results, fields) => {
         if (err?.sqlState === '45000') {
             return;
         }
         visitor_counter.default.setIleOsobNaWydarzeniu(results != undefined ? results[0][0].iloscOsob : 0)
     });
-    await sms.login();
+    // await sms.login();
     console.log(`Server running at http://${hostName}:${port}`);
 });

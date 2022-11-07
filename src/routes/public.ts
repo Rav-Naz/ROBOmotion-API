@@ -789,6 +789,27 @@ router.get('/getTimetables', (req, res, next) => {
     });
 });
 
+export function AKTYWNE_WALKI_I_PRZEJAZDY_pobierz(res: express.Response): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+        db.query("CALL `AKTYWNE_WALKI_I_PRZEJAZDY_pobierz(*)`();", (err, results, fields) => {
+            if (err?.sqlState === '45000') {
+                ClientError.badRequest(res, err.sqlMessage);
+                reject();
+                return;
+            } else if (err) {
+                ServerError.internalServerError(res, err.sqlMessage);
+                reject();
+                return;
+            }
+            resolve(results[0])
+        });
+    });
+}
+
+router.get('/getCurrentFightsOrTimes', async (req, res, next) => {
+    Success.OK(res, await AKTYWNE_WALKI_I_PRZEJAZDY_pobierz(res));
+});
+
 
 
 export default router;

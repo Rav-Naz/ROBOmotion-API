@@ -690,15 +690,16 @@ router.put('/editTimetable', (req, res, next) => {
     const body = req?.body;
     const harmonogram_id = Number(body?.harmonogram_id);
     const komorki = body?.komorki;
+    const czy_widoczny = body?.czy_widoczny;
 
     try {
-        HARMONOGRAM.validator({ harmonogram_id: harmonogram_id, komorki: komorki })
+        HARMONOGRAM.validator({ harmonogram_id: harmonogram_id, komorki: komorki, czy_aktywny: czy_widoczny })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `HARMONOGRAM_aktualizujKomorki(A)`(?,?);", [harmonogram_id, komorki], (err, results, fields) => {
+    db.query("CALL `HARMONOGRAM_aktualizujKomorki(A)`(?,?,?);", [harmonogram_id, komorki, czy_widoczny], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -709,7 +710,8 @@ router.put('/editTimetable', (req, res, next) => {
 
         let response = {
             harmonogram_id: harmonogram_id,
-            komorki: komorki
+            komorki: komorki,
+            czy_widoczny: czy_widoczny
         }
 
 

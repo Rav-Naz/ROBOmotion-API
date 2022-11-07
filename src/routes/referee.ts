@@ -13,6 +13,8 @@ import db from '../utils/database';
 import * as socketIO from '../utils/socket';
 import sms from '../utils/sms';
 import { GRUPY_WALK } from '../models/database/GRUPY_WALK';
+import { AKTYWNE_WALKI_I_PRZEJAZDY } from '../models/database/AKTYWNE_WALKI_I_PRZEJAZDY';
+import { AKTYWNE_WALKI_I_PRZEJAZDY_pobierz } from './public';
 
 const router = express.Router();
 
@@ -531,6 +533,76 @@ router.post('/sendPrivateMessage', (req, res, next) => {
             })
         }
         Success.OK(res, wiadomosc);
+    });
+});
+
+
+router.post('/addCurrentFightOrTime', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const kategoria_id = Number(body?.kategoria_id);
+    const ring_arena = Number(body?.ring_arena);
+    const robot1_id = Number(body?.robot1_id);
+    const robot2_id = Number(body?.robot2_id);
+
+    try {
+        AKTYWNE_WALKI_I_PRZEJAZDY.validator({ kategoria_id: kategoria_id, ring_arena: ring_arena, robot1_id: robot1_id, robot2_id: robot2_id, stanowisko_id: stanowisko_id })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `AKTYWNE_WALKI_I_PRZEJAZDY_dodajWpis(S)`(?,?,?,?,?);", [stanowisko_id, kategoria_id, ring_arena, robot1_id, robot2_id], async (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            aktywne_walki_i_przejazdy_id: results[0][0].aktywne_walki_i_przejazdy_id,
+            stanowisko_id: stanowisko_id,
+            kategoria_id: kategoria_id,
+            ring_arena: ring_arena,
+            robot1_id: robot1_id,
+            robot2_id: robot2_id
+        }
+        socketIO.default.getIO().emit("currentFightsOrTimes", await AKTYWNE_WALKI_I_PRZEJAZDY_pobierz(res));
+        Success.OK(res, response);
+    });
+});
+
+router.delete('/removeCurrentFightOrTime', (req, res, next) => {
+
+    const body = req?.body;
+    const stanowisko_id = Number(body?.stanowisko_id);
+    const kategoria_id = Number(body?.kategoria_id);
+    const ring_arena = Number(body?.ring_arena);
+
+    try {
+        AKTYWNE_WALKI_I_PRZEJAZDY.validator({ kategoria_id: kategoria_id, ring_arena: ring_arena, stanowisko_id: stanowisko_id })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `AKTYWNE_WALKI_I_PRZEJAZDY_usunWpis(S)`(?,?,?);", [stanowisko_id, kategoria_id, ring_arena], async (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            stanowisko_id: stanowisko_id,
+            kategoria_id: kategoria_id,
+            ring_arena: ring_arena
+        }
+        socketIO.default.getIO().emit("currentFightsOrTimes", await AKTYWNE_WALKI_I_PRZEJAZDY_pobierz(res));
+        Success.OK(res, response);
     });
 });
 

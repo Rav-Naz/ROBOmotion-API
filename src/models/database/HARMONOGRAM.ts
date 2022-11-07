@@ -7,6 +7,7 @@ export class HARMONOGRAM {
     kolumny?: number | undefined;
     wiersze?: number | undefined;
     komorki?: string | null | undefined;
+    czy_aktywny?: number | undefined;
 
 
     static validator(body: HARMONOGRAM = { harmonogram_id: undefined, kolumny: undefined, wiersze: undefined, interwal: undefined, komorki: undefined, godzina_rozpoczecia: undefined, nazwa: undefined }): void {
@@ -28,8 +29,11 @@ export class HARMONOGRAM {
         if ((typeof body.wiersze !== "number" || body.wiersze.toString().length > 11 || isNaN(body.wiersze)) && typeof body.wiersze !== "undefined" && typeof body.wiersze !== "object") {
             throw new Error('HARMONOGRAM.wiersze is not valid');
         }
-        if ((typeof body.komorki !== "string" || body.komorki.length > 10000) && typeof body.komorki !== "undefined") {
+        if ((typeof body.komorki !== "string") && typeof body.komorki !== "undefined") {
             throw new Error('HARMONOGRAM.komorki is not valid');
+        }
+        if ((typeof body.czy_aktywny !== "number" || body.czy_aktywny.toString().length > 1 || isNaN(body.czy_aktywny)) && typeof body.czy_aktywny !== "undefined") {
+            throw new Error('HARMONOGRAM.czy_aktywny is not valid');
         }
     }
 }
