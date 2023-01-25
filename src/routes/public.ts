@@ -72,6 +72,29 @@ export function KATEGORIE_czyToKategoriaWalki(res: express.Response, kategoria_i
     });
 }
 
+router.get('/userInTH/:email', (req, res, next) => {
+    const email = req.params.email;
+    try {
+        UZYTKOWNICY.validator({ email: email })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_czyUzytkownikMaTH(*)`(?);", [email], (err, results, fields) => {
+
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, results[0][0].exist);
+    });
+});
+
 router.get('/isItFightingCategory/:kategoria_id', (req, res, next) => {
     const kategoria_id = Number(req.params.kategoria_id);
     try {
