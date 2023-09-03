@@ -1,14 +1,14 @@
-export class UZYTKOWNICY{
+export class UZYTKOWNICY {
 
     uzytkownik_id?: number | undefined;
     uzytkownik_uuid?: string | undefined;
     uzytkownik_typ?: number | undefined;
     imie?: string | undefined;
     nazwisko?: string | undefined;
-    numer_telefonu?: string | null | undefined;
+    numer_telefonu?: string | undefined;
     email?: string | undefined;
     haslo?: string | undefined;
-    kod_pocztowy?: string | null | undefined;
+    kod_pocztowy?: string | undefined;
     data_rejestracji?: Date | undefined;
     preferowane_jedzenie?: number | null | undefined;
     rozmiar_koszulki?: number | null | undefined;
@@ -18,7 +18,7 @@ export class UZYTKOWNICY{
     czy_potwierdzony_numer_telefonu?: number | undefined;
 
 
-    static validator(body: UZYTKOWNICY = {uzytkownik_id: undefined, uzytkownik_uuid: undefined, uzytkownik_typ: undefined, imie: undefined, nazwisko: undefined, numer_telefonu: undefined, email: undefined, haslo: undefined, czy_potwierdzony_email: undefined, czy_potwierdzony_numer_telefonu: undefined, data_rejestracji: undefined, kod_pocztowy: undefined}): void  {
+    static validator(body: UZYTKOWNICY = { uzytkownik_id: undefined, uzytkownik_uuid: undefined, uzytkownik_typ: undefined, imie: undefined, nazwisko: undefined, numer_telefonu: undefined, email: undefined, haslo: undefined, czy_potwierdzony_email: undefined, czy_potwierdzony_numer_telefonu: undefined, data_rejestracji: undefined, kod_pocztowy: undefined }): void {
         if ((typeof body.uzytkownik_id !== "number" || body.uzytkownik_id.toString().length > 6 || isNaN(body.uzytkownik_id)) && typeof body.uzytkownik_id !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_id is not valid');
         }
@@ -34,7 +34,7 @@ export class UZYTKOWNICY{
         if ((typeof body.nazwisko !== "string" || body.nazwisko.length > 40 || body.nazwisko.length < 2) && typeof body.nazwisko !== "undefined") {
             throw new Error('UZYTKOWNICY.nazwisko is not valid');
         }
-        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 20 || body.numer_telefonu.length < 7) && typeof body.numer_telefonu !== "undefined" && typeof body.numer_telefonu !== "object") {
+        if ((typeof body.numer_telefonu !== "string" || body.numer_telefonu.length > 20 || body.numer_telefonu.length < 7) && typeof body.numer_telefonu !== "undefined") {
             throw new Error('UZYTKOWNICY.numer_telefonu is not valid');
         }
         const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
@@ -44,7 +44,7 @@ export class UZYTKOWNICY{
         if ((typeof body.haslo !== "string" || body.haslo.length > 64 || body.haslo.length < 6) && typeof body.haslo !== "undefined") {
             throw new Error('UZYTKOWNICY.haslo is not valid');
         }
-        if ((typeof body.kod_pocztowy !== "string" || body.kod_pocztowy.length > 8 || body.kod_pocztowy.length < 2) && typeof body.kod_pocztowy !== "undefined" && typeof body.kod_pocztowy !== "object") {
+        if ((typeof body.kod_pocztowy !== "string" || body.kod_pocztowy.length > 8 || body.kod_pocztowy.length < 2) && typeof body.kod_pocztowy !== "undefined") {
             throw new Error('UZYTKOWNICY.kod_pocztowy is not valid');
         }
         if (typeof body.data_rejestracji !== "string" && typeof body.data_rejestracji !== "undefined") {

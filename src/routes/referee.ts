@@ -70,6 +70,33 @@ router.get('/checkIfRobotHasCategory/:robot_uuid/:kategoria_id', (req, res, next
     });
 });
 
+router.put('/setRobotWeight', (req, res, next) => {
+
+
+    const body = req.body;
+    const robot_uuid = body?.robot_uuid;
+    const weight = Number(body?.weight);
+
+    try {
+        ROBOTY.validator({ robot_uuid: robot_uuid, });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `ROBOTY_edytujWage(S)`(?, ?, @p2);", [weight, robot_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, results[0][0]);
+    });
+});
+
 router.get('/checkIfPositionHasCategory/:stanowisko_id/:kategoria_id', (req, res, next) => {
 
     const stanowisko_id = Number(req.params?.stanowisko_id);

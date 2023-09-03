@@ -286,6 +286,7 @@ router.post('/registerUser', (req, res, next) => {
     const jedzenie = Number(body?.preferowane_jedzenie);
     const rozmiar_koszulki = Number(body?.rozmiar_koszulki);
     const czy_opiekun = body?.czy_opiekun;
+    const czy_bedzie_osobiscie = body?.czy_bedzie_osobiscie;
     const referencerToken = body?.referencerToken;
     const lang = body?.lang ? body?.lang : 'en';
 
@@ -304,7 +305,7 @@ router.post('/registerUser', (req, res, next) => {
         return;
     }
 
-    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?,?,?,?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString(), numer_telefonu, kod_pocztowy, jedzenie, rozmiar_koszulki, czy_opiekun, isForced], async (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?,?,?,?,?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString(), numer_telefonu, kod_pocztowy, jedzenie, rozmiar_koszulki, czy_opiekun, isForced, czy_bedzie_osobiscie], async (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);

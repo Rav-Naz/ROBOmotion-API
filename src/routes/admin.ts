@@ -17,6 +17,8 @@ import * as publicRoutes from '../routes/public';
 import { KATEGORIE_STANOWISKA } from '../models/database/KATEGORIE_STANOWISKA';
 import sms from '../utils/sms';
 import { HARMONOGRAM } from '../models/database/HARMONOGRAM';
+import { OGRANICZENIA_CZASOWE } from '../models/database/OGRANICZENIA_CZASOWE';
+import { KOMUNIKATY } from '../models/database/KOMUNIKATY';
 
 
 
@@ -748,6 +750,104 @@ router.delete('/deleteTimetable', (req, res, next) => {
 
 
         socketIO.default.getIO().emit("deleteTimetable", response);
+
+        Success.OK(res, response);
+    });
+});
+
+router.put('/editTimeLimit', (req, res, next) => {
+
+    const body = req?.body;
+    const ograniczenia_czasowe_id = Number(body?.ograniczenia_czasowe_id);
+    const data_rozpoczecia = new Date(body?.data_rozpoczecia);
+    const data_zakonczenia = new Date(body?.data_zakonczenia);
+    try {
+        OGRANICZENIA_CZASOWE.validator({ ograniczenia_czasowe_id: ograniczenia_czasowe_id })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `OGRANICZENIA_CZASOWE_edytujOgraniczenie(A)`(?,?,?);", [ograniczenia_czasowe_id, data_rozpoczecia, data_zakonczenia], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            ograniczenia_czasowe_id: ograniczenia_czasowe_id,
+            data_rozpoczecia: data_rozpoczecia,
+            data_zakonczenia: data_zakonczenia,
+        }
+
+        Success.OK(res, response);
+    });
+});
+
+router.post('/addAnnouncement', (req, res, next) => {
+
+    const body = req?.body;
+    const tresc = body?.tresc;
+    const link = body?.link;
+    const waga = Number(body?.waga);
+    try {
+        KOMUNIKATY.validator({ tresc: tresc, link: link, waga: waga })
+
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `KOMUNIKATY_dodajKomunikat(A)`(?,?,?);", [tresc, link, waga], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            tresc: tresc,
+            link: link,
+            waga: waga,
+        }
+
+        Success.OK(res, response);
+    });
+});
+
+router.post('/addAnnouncement', (req, res, next) => {
+
+    const body = req?.body;
+    const tresc = body?.tresc;
+    const link = body?.link;
+    const waga = Number(body?.waga);
+    try {
+        KOMUNIKATY.validator({ tresc: tresc, link: link, waga: waga })
+
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `KOMUNIKATY_dodajKomunikat(A)`(?,?,?);", [tresc, link, waga], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        let response = {
+            tresc: tresc,
+            link: link,
+            waga: waga,
+        }
 
         Success.OK(res, response);
     });

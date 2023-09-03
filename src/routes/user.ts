@@ -18,8 +18,8 @@ const router = express.Router();
 function KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res: express.Response, robot_uuid: string, uzytkownik_uuid: string): Promise<object> {
     return new Promise<object>((resolve, reject) => {
         try {
-            ROBOTY.validator({robot_uuid: robot_uuid});
-            UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+            ROBOTY.validator({ robot_uuid: robot_uuid });
+            UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
         } catch (err: any) {
             ClientError.notAcceptable(res, err.message);
             reject();
@@ -44,7 +44,7 @@ function KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res: express.Respons
 export function KONSTRUKTORZY_pobierzWszystkieRobotyKonstruktora(uzytkownik_uuid: string, res?: express.Response): Promise<object> {
     return new Promise<object>((resolve, reject) => {
         try {
-            UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+            UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
         } catch (err: any) {
             if (res) {
                 ClientError.notAcceptable(res, err.message);
@@ -76,14 +76,14 @@ router.get('/checkIfUserIsConstructorOfRobot/:uzytkownik_uuid/:robot_uuid', (req
     const robot_uuid = req.params?.robot_uuid;
     const uzytkownik_uuid = req.params?.uzytkownik_uuid;
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid).catch(() => {
+    KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid).catch(() => {
         ServerError.internalServerError(res);
     }).then((result) => {
         Success.OK(res, Object(result));
@@ -99,16 +99,16 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -119,7 +119,7 @@ router.post('/addRobotCategory', access.default.canModify, async (req, res, next
             ClientError.badRequest(res, err.sqlMessage);
             return;
         } else if (err) {
-            if(err.code == "ER_DUP_ENTRY") {
+            if (err.code == "ER_DUP_ENTRY") {
                 ClientError.conflict(res, "Duplicate entry");
             } else {
                 ServerError.internalServerError(res, err.sqlMessage);
@@ -146,16 +146,16 @@ router.delete('/deleteRobotCategory', access.default.canModify, async (req, res,
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -190,16 +190,16 @@ router.post('/addConstructor', access.default.canModify, async (req, res, next) 
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
-        UZYTKOWNICY.validator({uzytkownik_uuid: nowy_uzytkownik_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+        UZYTKOWNICY.validator({ uzytkownik_uuid: nowy_uzytkownik_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -232,15 +232,15 @@ router.get('/getConstructors/:robot_uuid', async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 1) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 1) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -269,15 +269,15 @@ router.delete('/deleteConstructor', access.default.canModify, async (req, res, n
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        KONSTRUKTORZY.validator({konstruktor_id: konstruktor_id});
+        KONSTRUKTORZY.validator({ konstruktor_id: konstruktor_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -332,8 +332,8 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({nazwa: nazwa});
-        KATEGORIE.validator({kategoria_id: kategoria_id});
+        ROBOTY.validator({ nazwa: nazwa });
+        KATEGORIE.validator({ kategoria_id: kategoria_id });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -357,8 +357,8 @@ router.post('/addRobot', access.default.canModify, async (req, res, next) => {
         const konstruktor = {
             konstruktor_id: results[1][0].konstruktor_id
         };
-        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("robots/addRobot", {robot, konstruktor});
-        Success.OK(res, {robot, konstruktor});
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).emit("robots/addRobot", { robot, konstruktor });
+        Success.OK(res, { robot, konstruktor });
     });
 });
 
@@ -370,15 +370,15 @@ router.put('/updateRobot', access.default.canModify, async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({nazwa: nazwa, robot_uuid: robot_uuid});
+        ROBOTY.validator({ nazwa: nazwa, robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -408,7 +408,7 @@ router.get('/getAllRobotsOfUser', (req, res, next) => {
 
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid});
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -428,15 +428,15 @@ router.delete('/deleteRobot', access.default.canModify, async (req, res, next) =
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -469,22 +469,22 @@ router.post('/uploadDocumentation', access.default.canModifyDocumentation, async
 
     // Success.OK(res);
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
     }
 
     try {
-        if(!req.files) {
+        if (!req.files) {
             ClientError.notAcceptable(res, "No file sended");
         } else {
             let doc = req.files.documentation as fileUpload.UploadedFile;
@@ -499,17 +499,17 @@ router.post('/uploadDocumentation', access.default.canModifyDocumentation, async
 
             const fileType = doc.name.split('.').reverse()[0]
             const path = './documentations/' + robot_uuid + '.' + fileType;
-            
-            if (fs.existsSync('./documentations/'+robot_uuid+'.docx')) {
-                fs.unlinkSync('./documentations/'+robot_uuid+'.docx');
+
+            if (fs.existsSync('./documentations/' + robot_uuid + '.docx')) {
+                fs.unlinkSync('./documentations/' + robot_uuid + '.docx');
             }
-            if (fs.existsSync('./documentations/'+robot_uuid+'.doc')) {
-                fs.unlinkSync('./documentations/'+robot_uuid+'.doc');
+            if (fs.existsSync('./documentations/' + robot_uuid + '.doc')) {
+                fs.unlinkSync('./documentations/' + robot_uuid + '.doc');
             }
-            if (fs.existsSync('./documentations/'+robot_uuid+'.pdf')) {
-                fs.unlinkSync('./documentations/'+robot_uuid+'.pdf');
+            if (fs.existsSync('./documentations/' + robot_uuid + '.pdf')) {
+                fs.unlinkSync('./documentations/' + robot_uuid + '.pdf');
             }
-            
+
             doc.mv(path);
 
             db.query("CALL `ROBOTY_dodajDokumentacje(U)`(?, ?);", [robot_uuid, path], (err, results, fields) => {
@@ -526,9 +526,9 @@ router.post('/uploadDocumentation', access.default.canModifyDocumentation, async
                 path: path,
                 isSucces: true,
             };
-            
+
             socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/uploadDocumentation", resp);
-            Success.OK(res,resp)
+            Success.OK(res, resp)
         }
     } catch (err) {
         ServerError.internalServerError(res);
@@ -542,15 +542,15 @@ router.get('/downloadDocumentation/:robot_uuid', async (req, res) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
@@ -574,25 +574,26 @@ router.post('/addFilm', access.default.canModifyDocumentation, async (req, res, 
 
     const body = req.body;
     const link_do_filmiku = body?.link_do_filmiku as string;
+    const link_do_filmiku_2 = body?.link_do_filmiku_2 as string;
     const robot_uuid = body?.robot_uuid;
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        ROBOTY.validator({robot_uuid: robot_uuid});
+        ROBOTY.validator({ robot_uuid: robot_uuid });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    if((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
-        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res,robot_uuid,uzytkownik_uuid);
-        if((czyJest as any).pCzyJest == 0) {
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
             ClientError.unauthorized(res, "User is not constructor of a robot");
             return;
         }
     }
 
-    db.query("CALL `ROBOTY_dodajFilmik(U)`(?, ?);", [robot_uuid, link_do_filmiku], (err, results, fields) => {
+    db.query("CALL `ROBOTY_dodajFilmik(U)`(?, ?, ?);", [robot_uuid, link_do_filmiku, link_do_filmiku_2], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -604,7 +605,9 @@ router.post('/addFilm', access.default.canModifyDocumentation, async (req, res, 
         const resp = {
             robot_id: results[0][0].robot_id,
             robot_uuid: robot_uuid,
-            link_do_filmiku: link_do_filmiku        };
+            link_do_filmiku: link_do_filmiku,
+            link_do_filmiku_2: link_do_filmiku_2,
+        };
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to(`robots/${robot_uuid}`).to("referee").to("admin").emit("robots/addFilm", resp);
         Success.OK(res, resp);
     });
@@ -617,7 +620,7 @@ router.post('/addUserPhoneNumber', async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        UZYTKOWNICY.validator({numer_telefonu: numer_telefonu});
+        UZYTKOWNICY.validator({ numer_telefonu: numer_telefonu });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -648,7 +651,7 @@ router.post('/addPostalCode', (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
     const kod_pocztowy = body?.kod_pocztowy;
     try {
-        UZYTKOWNICY.validator({uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy})
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, kod_pocztowy: kod_pocztowy })
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -672,7 +675,7 @@ router.post('/addPostalCode', (req, res, next) => {
     });
 });
 
-router.put('/editUser',  async (req, res, next) => {
+router.put('/editUser', async (req, res, next) => {
 
     const body = req.body;
     const imie = body?.imie;
@@ -680,7 +683,7 @@ router.put('/editUser',  async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        UZYTKOWNICY.validator({nazwisko: nazwisko, imie: imie});
+        UZYTKOWNICY.validator({ nazwisko: nazwisko, imie: imie });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -694,7 +697,7 @@ router.put('/editUser',  async (req, res, next) => {
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        
+
         const uzytkownik = {
             uzytkownik_id: results[0][0].uzytkownik_id,
             uzytkownik_uuid: uzytkownik_uuid,
@@ -720,11 +723,11 @@ router.get('/getUser', async (req, res, next) => {
             return;
         }
         let result = results[0][0]
-        Success.OK(res, {...result, token: req.query.JWT});
+        Success.OK(res, { ...result, token: req.query.JWT });
     });
 });
 
-router.delete('/deleteUser', access.default.canModify,  async (req, res, next) => {
+router.delete('/deleteUser', access.default.canModify, async (req, res, next) => {
 
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
@@ -736,13 +739,13 @@ router.delete('/deleteUser', access.default.canModify,  async (req, res, next) =
             ServerError.internalServerError(res, err.sqlMessage);
             return;
         }
-        
+
         const uzytkownik = {
             uzytkownik_id: results[0][0].uzytkownik_id,
             uzytkownik_uuid: uzytkownik_uuid,
             isSucces: results[0][0].pIsSucces
         };
-        
+
         socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").emit("users/deleteUser", uzytkownik);
         Success.OK(res, uzytkownik);
     });
@@ -756,7 +759,7 @@ router.put('/changeUserPassword', async (req, res, next) => {
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
 
     try {
-        UZYTKOWNICY.validator({haslo: noweHaslo});
+        UZYTKOWNICY.validator({ haslo: noweHaslo });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -780,4 +783,102 @@ router.put('/changeUserPassword', async (req, res, next) => {
     });
 });
 
+router.put('/changePersonally', async (req, res, next) => {
+
+    const body = req.body;
+    const czy_bedzie_osobiscie = body?.czy_bedzie_osobiscie;
+
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_zmienCzyOsobiscie(U)`(?,?);", [uzytkownik_uuid, czy_bedzie_osobiscie], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        const uzytkownik = {
+            uzytkownik_uuid: uzytkownik_uuid,
+            czy_bedzie_osobiscie: czy_bedzie_osobiscie
+        };
+        Success.OK(res, uzytkownik);
+    });
+});
+
+router.put('/editDocumentation', async (req, res, next) => {
+
+    const body = req.body;
+    const robot_uuid = body?.robot_uuid;
+    const pole1 = body?.pole1;
+    const pole2 = body?.pole2;
+    const pole3 = body?.pole3;
+    const pole4 = body?.pole4;
+    const pole5 = body?.pole5;
+    const pole6 = body?.pole6;
+
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `DOKUMENTACJE_dodajDokumentacje(U)`(?,?,?,?,?,?,?);", [robot_uuid, pole1, pole2, pole3, pole4, pole5, pole6], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+
+        Success.OK(res, {});
+    });
+});
+router.get('/getRobotDocumentation/:robot_uuid', access.default.canModify, async (req, res, next) => {
+
+    const robot_uuid = req.params?.robot_uuid;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+
+    try {
+        ROBOTY.validator({ robot_uuid: robot_uuid });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    if ((req.query.JWTdecoded as any).uzytkownik_typ < 2) {
+        const czyJest = await KONSTRUKTORZY_czyUzytkownikJestKonstruktoremRobota(res, robot_uuid, uzytkownik_uuid);
+        if ((czyJest as any).pCzyJest == 0) {
+            ClientError.unauthorized(res, "User is not constructor of a robot");
+            return;
+        }
+    }
+
+    db.query("CALL `DOKUMENTACJE_pobierzDokumentacje(U)`(?);", [robot_uuid], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            if (err.code == "ER_DUP_ENTRY") {
+                ClientError.conflict(res, "Duplicate entry");
+            } else {
+                ServerError.internalServerError(res, err.sqlMessage);
+            }
+            return;
+        }
+        Success.OK(res, results[0][0]);
+    });
+});
 export default router;
