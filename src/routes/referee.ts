@@ -223,15 +223,16 @@ router.post('/setFightResult', (req, res, next) => {
     const wygrane_rundy_robot1 = Number(body?.wygrane_rundy_robot1);
     const wygrane_rundy_robot2 = Number(body?.wygrane_rundy_robot2);
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    const uwagi = body?.uwagi;
 
     try {
-        WALKI.validator({ wygrane_rundy_robot1: wygrane_rundy_robot1, wygrane_rundy_robot2: wygrane_rundy_robot2, walka_id: walka_id });
+        WALKI.validator({ wygrane_rundy_robot1: wygrane_rundy_robot1, wygrane_rundy_robot2: wygrane_rundy_robot2, walka_id: walka_id, uwagi: uwagi });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
     }
 
-    db.query("CALL `WALKI_ustalWynikWalki(S)`(?,?,?,@p2,?);", [walka_id, wygrane_rundy_robot1, wygrane_rundy_robot2, uzytkownik_uuid], (err, results, fields) => {
+    db.query("CALL `WALKI_ustalWynikWalki(S)`(?,?,?,@p2,?,?);", [walka_id, wygrane_rundy_robot1, wygrane_rundy_robot2, uzytkownik_uuid, uwagi], (err, results, fields) => {
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
             return;
@@ -249,6 +250,7 @@ router.post('/setFightResult', (req, res, next) => {
             wygrane_rundy_robot1: wygrane_rundy_robot1,
             wygrane_rundy_robot2: wygrane_rundy_robot2,
             isSucces: results[0][0].pIsSucces,
+            uwagi: uwagi
         }
 
         socketIO.default.getIO().to(`robots/${walka.robot1_uuid}`).to(`robots/${walka.robot2_uuid}`).emit("robots/setFightResult", walka);
@@ -325,6 +327,36 @@ router.put('/confirmStarterpackGiven', (req, res, next) => {
             czy_odebral_starterpack: 1
         }
         socketIO.default.getIO().to("referee").to("admin").emit("user/giveStarterpack", resp);
+        Success.OK(res);
+    });
+});
+
+router.put('/setBarcode', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = body?.uzytkownik_uuid;
+    const uzytkownik_kod = body?.uzytkownik_kod;
+
+    try {
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, uzytkownik_kod: uzytkownik_kod });
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_dodajKodKreskowy(S)`(?, ?);", [uzytkownik_uuid, uzytkownik_kod], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        let resp = {
+            uzytkownik_uuid: uzytkownik_uuid,
+            uzytkownik_kod: uzytkownik_kod
+        }
+        socketIO.default.getIO().to("referee").to("admin").emit("user/setBarcode", resp);
         Success.OK(res);
     });
 });

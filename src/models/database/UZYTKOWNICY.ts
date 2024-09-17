@@ -2,6 +2,7 @@ export class UZYTKOWNICY {
 
     uzytkownik_id?: number | undefined;
     uzytkownik_uuid?: string | undefined;
+    uzytkownik_kod?: string | null | undefined;
     uzytkownik_typ?: number | undefined;
     imie?: string | undefined;
     nazwisko?: string | undefined;
@@ -16,6 +17,7 @@ export class UZYTKOWNICY {
     czy_opiekun?: number | undefined;
     czy_potwierdzony_email?: number | undefined;
     czy_potwierdzony_numer_telefonu?: number | undefined;
+    wiek?: number | undefined;
 
 
     static validator(body: UZYTKOWNICY = { uzytkownik_id: undefined, uzytkownik_uuid: undefined, uzytkownik_typ: undefined, imie: undefined, nazwisko: undefined, numer_telefonu: undefined, email: undefined, haslo: undefined, czy_potwierdzony_email: undefined, czy_potwierdzony_numer_telefonu: undefined, data_rejestracji: undefined, kod_pocztowy: undefined }): void {
@@ -24,6 +26,9 @@ export class UZYTKOWNICY {
         }
         if ((typeof body.uzytkownik_uuid !== "string" || body.uzytkownik_uuid.length != 36) && typeof body.uzytkownik_uuid !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_uuid is not valid');
+        }
+        if ((typeof body.uzytkownik_kod !== "string" || body.uzytkownik_kod.length > 12) && typeof body.uzytkownik_kod !== "undefined") {
+            throw new Error('UZYTKOWNICY.uzytkownik_kod  is not valid');
         }
         if ((typeof body.uzytkownik_typ !== "number" || body.uzytkownik_typ.toString().length > 1 || isNaN(body.uzytkownik_typ)) && typeof body.uzytkownik_typ !== "undefined") {
             throw new Error('UZYTKOWNICY.uzytkownik_typ is not valid');
@@ -52,6 +57,9 @@ export class UZYTKOWNICY {
         }
         if ((typeof body.preferowane_jedzenie !== "number" || body.preferowane_jedzenie.toString().length > 2 || isNaN(body.preferowane_jedzenie)) && typeof body.preferowane_jedzenie !== "undefined" && typeof body.preferowane_jedzenie !== "object") {
             throw new Error('UZYTKOWNICY.preferowane_jedzenie is not valid');
+        }
+        if ((typeof body.wiek !== "number" || body.wiek.toString().length > 3 || isNaN(body.wiek)) && typeof body.wiek !== "undefined" && typeof body.wiek !== "object") {
+            throw new Error('UZYTKOWNICY.wiek is not valid');
         }
         if ((typeof body.rozmiar_koszulki !== "number" || body.rozmiar_koszulki.toString().length > 2 || isNaN(body.rozmiar_koszulki)) && typeof body.rozmiar_koszulki !== "undefined" && typeof body.rozmiar_koszulki !== "object") {
             throw new Error('UZYTKOWNICY.rozmiar_koszulki is not valid');

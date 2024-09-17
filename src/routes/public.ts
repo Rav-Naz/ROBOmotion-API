@@ -270,8 +270,8 @@ router.get('/checkIfRobotCanInThisPosition/:robot_uuid/:kategoria_id/:stanowisko
     });
 });
 
-const registerEmailTemplatePath = process.env.EMAIL_VIEWS_PATH + 'register.hbs';
-const registerEmailTemplatePathEng = process.env.EMAIL_VIEWS_PATH + 'registereng.hbs';
+const registerEmailTemplatePath = 'src/views/email/register.hbs';
+const registerEmailTemplatePathEng = 'src/views/email/registereng.hbs';
 var registerEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePath), 'utf8'));
 var registerEmailTemplateEng = Handlebars.compile(fs.readFileSync(path.resolve(registerEmailTemplatePathEng), 'utf8'));
 
@@ -283,7 +283,7 @@ router.post('/registerUser', (req, res, next) => {
     const haslo = body?.haslo;
     const numer_telefonu = body?.numer_telefonu;
     const kod_pocztowy = body?.kod_pocztowy;
-    const jedzenie = Number(body?.preferowane_jedzenie);
+    const wiek = Number(body?.wiek);
     const rozmiar_koszulki = Number(body?.rozmiar_koszulki);
     const czy_opiekun = body?.czy_opiekun;
     const czy_bedzie_osobiscie = body?.czy_bedzie_osobiscie;
@@ -291,7 +291,7 @@ router.post('/registerUser', (req, res, next) => {
     const lang = body?.lang ? body?.lang : 'en';
 
     try {
-        UZYTKOWNICY.validator({ imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, preferowane_jedzenie: jedzenie, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun });
+        UZYTKOWNICY.validator({ imie: imie, nazwisko: nazwisko, email: email, haslo: haslo, numer_telefonu: numer_telefonu, kod_pocztowy: kod_pocztowy, rozmiar_koszulki: rozmiar_koszulki, czy_opiekun: czy_opiekun, wiek: wiek });
     } catch (err: any) {
         ClientError.notAcceptable(res, err.message);
         return;
@@ -305,7 +305,7 @@ router.post('/registerUser', (req, res, next) => {
         return;
     }
 
-    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?,?,?,?,?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString(), numer_telefonu, kod_pocztowy, jedzenie, rozmiar_koszulki, czy_opiekun, isForced, czy_bedzie_osobiscie], async (err, results, fields) => {
+    db.query("CALL `UZYTKOWNICY_dodajUzytkownika(*)`(?,?,?,?,?,?,?,?,?,?,?,?);", [imie, nazwisko, email, auth.hashPassword(haslo).toString(), numer_telefonu, kod_pocztowy, 1, rozmiar_koszulki, czy_opiekun, isForced, czy_bedzie_osobiscie, wiek], async (err, results, fields) => {
 
         if (err?.sqlState === '45000') {
             ClientError.badRequest(res, err.sqlMessage);
@@ -352,8 +352,8 @@ router.post('/registerUser', (req, res, next) => {
     });
 });
 
-const resetPasswordEmailTemplatePath = process.env.EMAIL_VIEWS_PATH + 'resetpassword.hbs';
-const resetPasswordEmailTemplatePathEng = process.env.EMAIL_VIEWS_PATH + 'resetpasswordeng.hbs';
+const resetPasswordEmailTemplatePath = 'src/views/email/resetpassword.hbs';
+const resetPasswordEmailTemplatePathEng = 'src/views/email/resetpasswordeng.hbs';
 var resetPasswordEmailTemplate = Handlebars.compile(fs.readFileSync(path.resolve(resetPasswordEmailTemplatePath), 'utf8'));
 var resetPasswordEmailTemplateEng = Handlebars.compile(fs.readFileSync(path.resolve(resetPasswordEmailTemplatePathEng), 'utf8'));
 

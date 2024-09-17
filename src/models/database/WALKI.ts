@@ -9,6 +9,7 @@ export class WALKI {
     stanowisko_id?: number | undefined;
     nastepna_walka_id?: number | null | undefined;
     grupa_id?: number | undefined;
+    uwagi?: string | null | undefined;
 
 
     static validator(body: WALKI = { walka_id: undefined, robot1_id: undefined, robot2_id: undefined, wygrane_rundy_robot1: undefined, wygrane_rundy_robot2: undefined, czas_zakonczenia: undefined, grupa_id: undefined, nastepna_walka_id: undefined, stanowisko_id: undefined }): void {
@@ -39,7 +40,9 @@ export class WALKI {
         if ((typeof body.grupa_id !== "number" || body.grupa_id.toString().length > 3 || isNaN(body.grupa_id)) && typeof body.grupa_id !== "undefined") {
             throw new Error('WALKI.grupa_id is not valid');
         }
-
+        if ((typeof body.uwagi !== "string" || body.uwagi.length > 500) && typeof body.uwagi !== "undefined" && typeof body.uwagi !== "object") {
+            throw new Error('WALKI.uwagi is not valid');
+        }
 
     }
 }

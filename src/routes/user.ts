@@ -675,6 +675,36 @@ router.post('/addPostalCode', (req, res, next) => {
     });
 });
 
+router.post('/addAge', (req, res, next) => {
+
+    const body = req?.body;
+    const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
+    const wiek = body?.wiek;
+    try {
+        UZYTKOWNICY.validator({ uzytkownik_uuid: uzytkownik_uuid, wiek: wiek })
+    } catch (err: any) {
+        ClientError.notAcceptable(res, err.message);
+        return;
+    }
+
+    db.query("CALL `UZYTKOWNICY_dodajWiek(U)`(?, ?);", [uzytkownik_uuid, wiek], (err, results, fields) => {
+        if (err?.sqlState === '45000') {
+            ClientError.badRequest(res, err.sqlMessage);
+            return;
+        } else if (err) {
+            ServerError.internalServerError(res, err.sqlMessage);
+            return;
+        }
+        const response = {
+            pIsSucces: results[0][0].pIsSucces,
+            uzytkownik_id: results[0][0].uzytkownik_id,
+            wiek: wiek
+        };
+        socketIO.default.getIO().to(`users/${uzytkownik_uuid}`).to("referee").to("admin").to("referee").to("admin").emit("user/addAge", response);
+        Success.OK(res, response);
+    });
+});
+
 router.put('/editUser', async (req, res, next) => {
 
     const body = req.body;
