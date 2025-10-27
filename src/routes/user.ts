@@ -876,7 +876,7 @@ router.put('/editDocumentation', async (req, res, next) => {
         Success.OK(res, {});
     });
 });
-router.get('/getRobotDocumentation/:robot_uuid', access.default.canModify, async (req, res, next) => {
+router.get('/getRobotDocumentation/:robot_uuid', async (req, res, next) => {
 
     const robot_uuid = req.params?.robot_uuid;
     const uzytkownik_uuid = (req.query.JWTdecoded as any).uzytkownik_uuid;
